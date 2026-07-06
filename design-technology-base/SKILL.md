@@ -30,7 +30,7 @@ Load when resolving target stack before IR build or adaptation.
 2. Match `target_technology_stack` to `profiles.*.aliases` (case-insensitive, substring tolerant).
 3. If no match: map `architecture_type` → category default profile (`generic-backend` or registry default).
 4. Set `enabled_domains` from category + ADR hints.
-5. Write `technology_context.json` (structure below).
+5. Write `src/output_workflow/_internal/technology_context.json` — include from profile: `layerMapping`, `artifacts`, `references`, `bestPractices`, `adrDefaults`.
 6. Bump `meta.v` on UPDATE when profile unchanged.
 
 ## Output structure
