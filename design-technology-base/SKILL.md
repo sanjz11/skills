@@ -10,7 +10,7 @@ description: >-
 
 ## When to use
 
-- **Technology Context Builder** agent (V6) — resolves stack, writes `technology_context.json`
+- **Technology Context Builder** agent  — resolves stack, writes `technology_context.json`
 - Technology Adapter loads `profile.skill` / `profile.adapter` from registry
 
 ## V6 architecture
@@ -66,7 +66,7 @@ Generic agents never read adapter skills. Only Technology Adapter Agent loads `a
 | integration | Integration/ | IntegrationDesign.json |
 | cloud | Cloud/ | CloudDesign.json |
 
-## Workflow graph routing (V6)
+## Workflow graph routing 
 
 V6 uses a **single linear pipeline** — no per-stack graph branching. The Technology Adapter decides which artifact folders to emit based on IR content and `technology_context.category`.
 
