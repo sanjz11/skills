@@ -1,0 +1,18 @@
+{
+  "meta": {
+    "techProfile": "<from technology_context.profileId>",
+    "irVersion": "<from core_design_model.meta.v>",
+    "adapter": "java-adapter",
+    "assumptions": []
+  },
+  "layers": {
+    "presentation": { "controllers": [], "dtos": [] },
+    "business": { "services": [], "domainRules": [] },
+    "data": { "repositories": [], "entities": [] },
+    "integration": { "clients": [], "listeners": [] },
+    "configuration": { "properties": [], "beans": [] }
+  },
+  "apiOperations": [],
+  "legacyMigration": [],
+  "openapiRef": "openapi.yaml"
+}

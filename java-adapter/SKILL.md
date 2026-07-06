@@ -80,6 +80,33 @@ For each `legacyLogicMigration[]` entry: **Java** pseudo-code in Design/Presenta
 
 camelCase classes; PascalCase types; packages by bounded context.
 
+## Reference patterns (load via skills tool)
+
+Registry profile `java-spring` lists:
+
+- `references/controller-pattern.md`
+- `references/repository-pattern.md`
+- `references/Design-json-shape.json`
+
+Load each reference file from this adapter skill folder. **Render IR into reference JSON/Markdown shapes** — tune stack output by editing references in GitHub, not workflow prompts.
+
+## Best practices (Java / Spring Boot)
+
+- Constructor injection only; avoid field injection
+- OpenAPI 3.1 generated from IR apiOperations
+- Transactional boundaries on service layer not controllers
+
+## Tuning strategy
+
+| Change | Edit here | Do not edit |
+|--------|-----------|-------------|
+| Output file shape | `references/*-shape.json` | IR schema |
+| Layer mapping labels | `technology-registry.json` → layerMapping | generic skills |
+| Stack conventions | This SKILL.md + references | workflow user prompt |
+| ADR defaults | registry `adrDefaults` | adr-blueprint keys list |
+
+Future phases: `implementationSkill` + `testingSkill` in registry (see `config/agent-contracts.json`).
+
 ## Do not
 
 - Write `consolidated_design.md` or `consolidated_design.json`

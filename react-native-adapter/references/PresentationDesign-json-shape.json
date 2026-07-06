@@ -1,0 +1,8 @@
+{
+  "meta": { "techProfile": "", "irVersion": "", "adapter": "", "assumptions": [] },
+  "screens": [],
+  "navigation": { "stacks": [], "routes": [] },
+  "components": [],
+  "stateModel": {},
+  "apiClient": { "methods": [] }
+}

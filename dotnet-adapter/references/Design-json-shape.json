@@ -1,0 +1,12 @@
+{
+  "meta": { "techProfile": "", "irVersion": "", "adapter": "", "assumptions": [] },
+  "layers": {
+    "presentation": { "apiSurface": [] },
+    "business": { "logic": [] },
+    "data": { "access": [] },
+    "integration": { "external": [] },
+    "configuration": { "settings": [] }
+  },
+  "apiOperations": [],
+  "legacyMigration": []
+}

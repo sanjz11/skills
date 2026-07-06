@@ -70,9 +70,18 @@ Record every inference in `meta.assumptions[]` with `id`, `topic`, `assumption`,
 | External systems, events | integration |
 | Env, feature flags | configuration |
 
-## Do not
+## Tuning strategy
 
-- Emit openapi.yaml, Design.json, consolidated deliverables, or stack artifacts
+| Layer | Tune when… | Location |
+|-------|------------|----------|
+| ADR defaults | Stack needs different auth/API defaults | `technology-registry.json` → `adrDefaults` |
+| Requirements | ADR synthesis rules | `design-requirements-base` skill |
+| IR content | Domain depth | generic skills (not workflow) |
+| Stack output | Java/React layout wrong | adapter `references/` only |
+
+Read `config/agent-contracts.json` for per-step goals and best practices.
+
+## Do not
 - Hardcode a programming language or framework in IR
 - Block completion because an optional upload was not provided
 

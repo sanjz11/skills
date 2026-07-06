@@ -77,6 +77,31 @@ For each `legacyLogicMigration[]` entry: **TypeScript/JSX** pseudo-code in Desig
 
 camelCase functions; PascalCase components.
 
+## Reference patterns (load via skills tool)
+
+Registry profile `react-native` lists:
+
+- `references/screen-navigation-pattern.md`
+- `references/PresentationDesign-json-shape.json`
+
+Load each reference file from this adapter skill folder. **Render IR into reference JSON/Markdown shapes** — tune stack output by editing references in GitHub, not workflow prompts.
+
+## Best practices (React Native)
+
+- Screens map to IR presentation layer capabilities
+- No server-side code in presentation artifacts
+
+## Tuning strategy
+
+| Change | Edit here | Do not edit |
+|--------|-----------|-------------|
+| Output file shape | `references/*-shape.json` | IR schema |
+| Layer mapping labels | `technology-registry.json` → layerMapping | generic skills |
+| Stack conventions | This SKILL.md + references | workflow user prompt |
+| ADR defaults | registry `adrDefaults` | adr-blueprint keys list |
+
+Future phases: `implementationSkill` + `testingSkill` in registry (see `config/agent-contracts.json`).
+
 ## Do not
 
 - Write `consolidated_design.md` or `consolidated_design.json`
