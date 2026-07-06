@@ -15,5 +15,10 @@ Public skills repo for Reunity Design Workflow V6.
 - `react-native-adapter`
 - `mulesoft-adapter`
 - `generic-adapter`
+- `react-adapter`
+- `angular-adapter`
+- `nodejs-adapter`
+- `python-adapter`
+- `dotnet-adapter`
 
 Each folder contains `SKILL.md` loaded by workflow agents from `github.com/sanjz11/skills`.
