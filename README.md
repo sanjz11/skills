@@ -6,6 +6,9 @@ Public skills repo for Reunity Design Workflow V6.
 
 - `design-generic-core`
 - `design-generic-enricher`
+- `design-generic-security`
+- `design-generic-data`
+- `design-generic-messaging`
 - `design-technology-base`
 - `design-deliverable`
 - `java-adapter`
