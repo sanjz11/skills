@@ -1,143 +1,87 @@
 ---
 name: design-generic-messaging
 description: >-
-  Enrich the Core Design Model IR with technology-agnostic messaging and
-  event-driven design. Load during IR build when epic/ADR require async,
-  events, commands, or pub/sub. No broker vendor names or configs.
+  Enrich IR with technology-agnostic messaging. Primary goal: model events and
+  reliability when async is implied — or explicitly document sync-only with
+  assumption when epic is silent.
 ---
 
 # Generic Messaging (IR enrichment)
 
-## When to use
+## Primary goal
 
-Load this skill when building or patching `core_design_model.json` and requirements imply asynchronous communication, events, commands, or message-driven integration.
+Populate `messaging` in the IR with events, commands, patterns, and reliability — when epic/ADR require async communication — **or** explicitly record a sync-only assumption when no async signals exist. Never leave `messaging` ambiguous.
 
-**Output target:** enrich `messaging` and related `integrations` — do **not** create `MessageDesign.json` or broker-specific configs (the technology adapter maps IR later).
+## Success criteria
+
+- [ ] `messaging` is either fully specified **or** empty with `meta.assumptions` explaining sync-only decision
+- [ ] Events/commands link to `boundedContexts` and `integrations` when present
+- [ ] Delivery semantics and idempotency documented when events exist
+- [ ] No broker vendor names or configs
+- [ ] IR updated; `meta.v` bumped; no `MessageDesign.json` emitted
 
 **IR file:** `src/output_workflow/_internal/core_design_model.json`
 
-If epic/ADR have **no** async or event requirements, leave `messaging` empty — do not invent.
+## When to use
 
----
+Load when epic/ADR mention events, queues, pub/sub, integration flows, or saga/choreography — **or** when `integrations[]` imply async handoff.
 
-## Primary goal
+## Domain responsibilities
 
-Produce technology-agnostic messaging design in the IR — architecture patterns, message schemas, producer/consumer patterns, reliability guarantees, and observability — implementable on any messaging platform.
+### Architecture
+Pub/sub, point-to-point, request/reply, event sourcing, CQRS (when ADR requires).
 
----
+### Schemas
+Events, commands, headers, versioning, compatibility.
 
-## Responsibilities
+### Producers / consumers
+Groups, partitioning, ordering requirements.
 
-### 1. Messaging architecture
-- Broker patterns: topics, queues, exchanges (generic)
-- Message patterns: pub/sub, point-to-point, request/reply
-- Event sourcing and CQRS where ADR/epic require
-- Routing and filtering strategies
-- **No** Kafka/RabbitMQ/Service Bus-specific settings
+### Reliability
+Delivery guarantees, idempotency, DLQ, retry.
 
-### 2. Message schemas
-- Domain events and integration events
-- Commands and queries
-- Headers and metadata (correlation, trace, routing)
-- Schema versioning and backward compatibility
-- Serialization format requirements (JSON Schema concepts)
-- **No** Avro/Protobuf vendor bindings
+### Observability
+Metrics, tracing, correlation IDs.
 
-### 3. Producer / consumer patterns
-- Producer and consumer group concepts
-- Partitioning and ordering requirements
-- Scaling and load distribution (generic)
-- Consumer lifecycle patterns
+## Handling missing or incomplete inputs
 
-### 4. Reliability patterns
-- Delivery semantics: at-least-once, at-most-once, exactly-once
-- Idempotency and deduplication
-- Dead letter queue (DLQ) strategies
-- Retry policies and exponential backoff
-- **No** platform-specific retry configs
+| Situation | What to do |
+|-----------|------------|
+| Epic silent on messaging | If sync REST only → empty `messaging` + assumption "sync-only architecture" |
+| Integration list mentions external system | Add integration events for handoff points; `[REVIEW]` |
+| ADR says "event-driven" | Full event catalog from capabilities and bounded contexts |
+| No event schemas in epic | Define minimal schemas from entity lifecycle (Created/Updated/Deleted) |
+| Unclear sync vs async | Default sync; one `clarify` if integration count > 3 |
 
-### 5. Monitoring and observability
-- Throughput, latency, error rate metrics
-- Tracing and correlation (correlation IDs)
-- Alerting thresholds (generic)
-- Message lifecycle documentation
-
----
+**Do not** invent event storms or topics without business trigger in capabilities/APIs.
 
 ## What you can do
 
-- Design pub/sub, point-to-point, request/reply, event sourcing, CQRS (when required)
-- Define event/command schemas with versioning rules
-- Specify producer/consumer, partitioning, and ordering requirements
-- Document delivery guarantees, idempotency, DLQ, and retry patterns
-- Add correlation and tracing requirements to `observability` when needed
-- Populate IR `messaging` with compact JSON
-- Link events to `boundedContexts`, `apiOperations`, and `integrations`
-- Preserve existing IR; bump `meta.v` on change
+- Design full event/command models with reliability and monitoring
+- Link messaging to `integrations[]`
+- Document correlation and tracing requirements
 
 ## What you cannot do
 
-- Generate broker-specific configs (Kafka topics, RabbitMQ exchanges, etc.)
-- Recommend specific messaging platforms or vendors
-- Design sync REST APIs (messaging/async focus only)
-- Emit `MessageDesign.json` or files outside the IR
-- Invent events not grounded in epic/ADR
-- Specify auth for brokers (defer to `security` skill)
-- Define infrastructure provisioning or network topology
-
----
-
-## How to apply (procedure)
-
-1. Read epic, ADR, patterns, domain modelling, and existing IR.
-2. Confirm async/event requirements exist; otherwise skip or leave empty.
-3. Enrich `messaging`; cross-link `integrations[]` for external systems.
-4. Write updated IR; bump `meta.v`.
-
----
+- Kafka/RabbitMQ/Service Bus specific configs
+- Emit `MessageDesign.json`
+- Design messaging when system is purely request/response without documenting why
 
 ## IR output structure
 
 ```json
 {
   "messaging": {
-    "architecture": {
-      "patterns": ["pub-sub"],
-      "eventSourcing": {},
-      "cqrs": {},
-      "routing": {}
-    },
-    "events": [
-      { "id": "EVT-001", "name": "", "schema": {}, "version": "1.0", "source": "" }
-    ],
-    "commands": [
-      { "id": "CMD-001", "name": "", "schema": {}, "version": "1.0" }
-    ],
-    "patterns": {
-      "producers": [],
-      "consumers": [],
-      "partitioning": {},
-      "ordering": {}
-    },
-    "reliability": {
-      "delivery": "at-least-once",
-      "idempotency": {},
-      "dlq": {},
-      "retry": {}
-    },
-    "monitoring": {
-      "metrics": [],
-      "tracing": {},
-      "alerting": {}
-    }
+    "architecture": { "patterns": [], "eventSourcing": {}, "routing": {} },
+    "events": [{ "id": "EVT-001", "name": "", "schema": {}, "version": "1.0" }],
+    "commands": [],
+    "patterns": { "producers": [], "consumers": [], "partitioning": {} },
+    "reliability": { "delivery": "at-least-once", "idempotency": {}, "dlq": {}, "retry": {} },
+    "monitoring": { "metrics": [], "tracing": {} }
   }
 }
 ```
 
-Compact JSON; use IDs for repeated payload shapes.
+## Completion gate
 
----
-
-## Input grounding
-
-Ground every decision in epic, ADR, common patterns, and target domain modelling. Cite ADR for cross-cutting messaging choices.
+Messaging either populated with traceable events or explicitly sync-only with assumption.

@@ -1,16 +1,37 @@
 ---
 name: react-native-adapter
 description: >-
-  Map Core Design Model IR to React Native internal artifacts. Load when technology_context.profile.skill is react-native-adapter.
+  Map IR to React Native internal artifacts. Primary goal: always produce
+  stack-specific files from IR + technology_context. Proceed with assumptions
+  when IR sections are empty. Load when technology_context.profile.skill is react-native-adapter.
+---
 
 # React Native Adapter
 
-Map IR layers using `profile.layerMapping`. **Do not** emit Spring/Java artifacts.
+## Primary goal
+
+Transform `core_design_model.json` into **complete internal React Native design artifacts** under `_internal/` — using `technology_context.profile.skill`, `layerMapping`, and `artifacts` — **even when IR sections are partial or epic uploads were missing**.
+
+## Success criteria
+
+- [ ] Read `src/output_workflow/_internal/core_design_model.json` and `src/output_workflow/_internal/technology_context.json` first
+- [ ] Loaded skill matches `technology_context.profile.skill` (react-native-adapter)
+- [ ] Required profile artifacts written under `src/output_workflow/_internal/`
+- [ ] `legacyLogicMigration` rendered as **TypeScript/JSX** pseudo-code in `.md` files with `// Legacy line N:` traceability
+- [ ] Each JSON artifact includes `meta.techProfile`, `meta.irVersion`, `meta.adapter`
+- [ ] Empty IR sections: skip file OR write minimal stub with `meta.assumptions` — never fail silently
+- [ ] No consolidated deliverables at workflow root
+
+## Inputs
+
+- `src/output_workflow/_internal/core_design_model.json`
+- `src/output_workflow/_internal/technology_context.json`
+- `config/technology-registry.json` (reference)
 
 ## Layer → artifact mapping
 
 | IR layer | React Native artifacts |
-|----------|------------------------|
+|----------|---------------------------|
 | presentation | Screen, Component, Navigation stack |
 | business | Custom hook, use-case module |
 | data | API client, repository, AsyncStorage/SQLite adapter |
@@ -19,13 +40,50 @@ Map IR layers using `profile.layerMapping`. **Do not** emit Spring/Java artifact
 
 ## Outputs
 
-- `src/output_workflow/_internal/Presentation/PresentationDesign.json` — screens, navigation, components, state
-- `src/output_workflow/_internal/Presentation/PresentationDesign.md` + `_Diagrams.mmd`
-- `src/output_workflow/_internal/Application/Design.json` — **client layer only** (API client, DTOs, error mapping)
-- Skip Security.json, Database.json, MessageDesign.json unless IR sections are non-empty and relevant to mobile
+- `src/output_workflow/_internal/Presentation/PresentationDesign.json`
+- `src/output_workflow/_internal/Presentation/PresentationDesign.md`
+- `src/output_workflow/_internal/Application/Design.json`
 
-## Rules
+## Procedure
 
-- TypeScript/JSX pseudo-code for client business logic only
-- Server-side legacy SP migration: document as backend API dependency, not Java service code
-- Reference `apiOperations` for API client method design
+1. Read IR and technology context.
+2. Load this skill via skills tool.
+3. Map each non-empty IR layer per `layerMapping`.
+4. Generate openapi/contracts from `apiOperations` when profile includes them.
+5. Map `security`, `data`, `messaging` IR sections to folder JSONs when non-empty and category-relevant.
+6. Write all artifacts; bump `meta.v` on updates.
+
+## Handling missing or incomplete inputs
+
+You must still produce adapter artifacts. IR is the source of truth.
+
+| Situation | What to do |
+|-----------|------------|
+| IR section empty | Skip that artifact file OR emit minimal stub documenting omission in artifact `meta.assumptions` |
+| apiOperations incomplete | Complete from capabilities using RESTful conventions; flag `[REVIEW]` in meta |
+| No legacyLogicMigration | Omit pseudo-code blocks — do not invent legacy |
+| technology_context partial | Re-read registry; never guess a different profile |
+| Epic never uploaded | Rely entirely on IR + technology_context |
+
+Stack-specific: Server-side legacy → document as API dependency. Skip Security/Database unless IR sections non-empty and mobile-relevant.
+
+Use `clarify` only if `technology_context.profileId` conflicts with registry or IR stack hints.
+
+## Legacy migration
+
+For each `legacyLogicMigration[]` entry: **TypeScript/JSX** pseudo-code in Design/Presentation `.md` with traceability comments.
+
+## Naming
+
+camelCase functions; PascalCase components.
+
+## Do not
+
+- Write `consolidated_design.md` or `consolidated_design.json`
+- Load a different adapter skill than `profile.skill`
+- Invent APIs or rules absent from IR (infer only with `meta.assumptions`)
+- Use a stack that does not match `technology_context.profileId` (react-native)
+
+## Completion gate
+
+All applicable outputs exist under `_internal/`; assumptions recorded for every inferred design element.

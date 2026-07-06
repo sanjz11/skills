@@ -1,147 +1,92 @@
 ---
 name: design-generic-data
 description: >-
-  Enrich the Core Design Model IR with technology-agnostic data and persistence
-  design. Load during IR build when epic/ADR require schema, storage, migration,
-  performance, or backup/recovery. No database vendor or DDL syntax.
+  Enrich IR with technology-agnostic data design. Primary goal: model entities
+  and persistence from domain/inputs or inferred from APIs — never skip because
+  epic omitted database section.
 ---
 
 # Generic Data (IR enrichment)
 
-## When to use
+## Primary goal
 
-Load this skill when building or patching `core_design_model.json` and requirements imply persistent data, schema, migrations, or data architecture.
+Populate `data`, `dataEntities`, and relationships in the IR with conceptual schema, persistence approach, migrations, performance notes, and backup strategy — **from domain model and APIs when epic lacks a database section** — with every inference documented.
 
-**Output target:** enrich `data`, `dataEntities`, and related IR sections — do **not** create `Database.json` or vendor-specific DDL (the technology adapter maps IR later).
+## Success criteria
+
+- [ ] `dataEntities[]` aligns with `apiOperations` and `boundedContexts` when those exist
+- [ ] `data.architecture`, `data.entities`, `data.relationships` populated or empty with assumption
+- [ ] Conceptual types only — no SQL/DDL/vendor syntax
+- [ ] `meta.assumptions[]` for every entity or pattern not directly stated in inputs
+- [ ] IR updated; `meta.v` bumped; no `Database.json` emitted
 
 **IR file:** `src/output_workflow/_internal/core_design_model.json`
 
----
+## When to use
 
-## Primary goal
+Load when requirements imply persistence **or** when APIs/entities imply stored data (default for backend/fullstack).
 
-Analyze application data requirements and produce technology-agnostic data design in the IR — architecture concepts, conceptual schema, migration approach, performance considerations, and backup/recovery — implementable on any database platform.
+## Domain responsibilities
 
----
+### Data architecture
+Storage type (relational/document/etc.), topology, HA, scalability — conceptual.
 
-## Responsibilities
+### Schema design
+Entities, attributes, relationships, indexing intent, normalization/denormalization.
 
-### 1. Data architecture
-- Generic storage types: relational, document, key-value, graph, columnar, time-series
-- Topology: single instance, primary-replica, multi-master, sharding (conceptual)
-- Deployment: on-premise, cloud, hybrid, managed service (generic)
-- High availability and replication patterns
-- Scalability: horizontal/vertical, partitioning
-- **No** vendor-specific implementations
+### Migrations
+Versioning, rollback, zero-downtime concepts.
 
-### 2. Schema design
-- Conceptual entities/collections, attributes, relationships
-- Generic data types and constraints (string, uuid, datetime, decimal)
-- Normalization (relational) or denormalization (document) strategies
-- Indexing strategies (primary, secondary, composite, unique — generic)
-- Referential integrity patterns
-- Align with `dataEntities[]` and `boundedContexts[]`
+### Performance
+Access patterns, caching, capacity notes.
 
-### 3. Migration strategies
-- Versioning and rollout approaches
-- Rollback and testing patterns
-- Zero-downtime migration concepts
-- **No** Flyway/Liquibase/vendor tool syntax
+### Backup / recovery
+RTO/RPO when ADR states; generic backup strategies otherwise.
 
-### 4. Performance optimization
-- Query optimization patterns (generic)
-- Indexing for access patterns
-- Caching strategies
-- Connection pooling (conceptual)
-- Capacity planning guidance (not instance sizing)
+## Handling missing or incomplete inputs
 
-### 5. Backup and recovery
-- Backup types: full, incremental, differential, continuous
-- RTO/RPO requirements when stated in ADR
-- Disaster recovery patterns
-- Retention and archival strategies
-- Point-in-time recovery (conceptual)
+Data enrichment **must proceed** when APIs or entities exist without a database chapter in epic.
 
----
+| Situation | What to do |
+|-----------|------------|
+| No domain model upload | Derive entities from `apiOperations` request/response schemas and resource names |
+| Epic silent on DB type | Default `relational` for CRUD APIs; assumption with `[REVIEW]` |
+| No migration requirements | Include minimal `migrations.strategy: "incremental"` baseline |
+| No RTO/RPO in ADR | Omit numeric targets; note "TBD with operations" in assumption |
+| Frontend/mobile only | Minimal client-side store entities only; defer server schema |
+| No persistence needed | Leave `data` sparse; assumption: "stateless/BFF-only per category" |
+
+Use `clarify` when ADR implies both SQL and document store without choosing.
 
 ## What you can do
 
-- Design conceptual schemas and entity relationships
-- Map entities to bounded contexts and `apiOperations`
-- Define generic indexing and access-pattern notes
-- Document migration, HA, scaling, and backup strategies at concept level
-- Specify transaction/consistency models (ACID vs BASE) when relevant
-- Add multi-tenancy patterns when ADR requires
-- Populate IR `data` with compact JSON
-- Preserve existing IR fields; bump `meta.v` on change
+- Design conceptual ERD, entities, relationships, indexing intent
+- Cross-link `dataEntities` and `boundedContexts`
+- Document migration and backup at concept level
 
 ## What you cannot do
 
-- Generate SQL DDL, MongoDB commands, or proprietary syntax
-- Recommend specific database vendors without neutral comparison
-- Design schemas without grounding in epic/domain model
-- Emit `Database.json`, `Database.md`, or files outside the IR
-- Specify exact cloud instance types or hardware
-- Invent data requirements not in epic/ADR
-- Over-index or denormalize without justified access patterns
-
----
-
-## How to apply (procedure)
-
-1. Read epic, ADR, patterns, domain modelling, and existing IR.
-2. Cross-reference `dataEntities[]`, `apiOperations[]`, and `businessRules`.
-3. Enrich `data` and align or extend `dataEntities[]`.
-4. Add only sections requirements support.
-5. Write updated IR; bump `meta.v`.
-
----
+- Emit SQL, MongoDB commands, or `Database.json`
+- Recommend a specific database vendor as the only option
+- Invent entities unrelated to capabilities/APIs
 
 ## IR output structure
 
 ```json
 {
-  "dataEntities": [
-    { "id": "ENT-001", "name": "", "attributes": [], "boundedContext": "" }
-  ],
+  "dataEntities": [{ "id": "ENT-001", "name": "", "attributes": [], "boundedContext": "" }],
   "data": {
-    "architecture": {
-      "storageType": "relational",
-      "topology": "",
-      "ha": {},
-      "scalability": {}
-    },
+    "architecture": { "storageType": "relational", "topology": "", "ha": {}, "scalability": {} },
     "entities": [],
     "relationships": [],
-    "persistence": {
-      "accessPatterns": [],
-      "indexing": [],
-      "caching": {},
-      "consistency": ""
-    },
-    "migrations": {
-      "strategy": "",
-      "versioning": {},
-      "rollback": {}
-    },
-    "performance": {
-      "optimization": [],
-      "capacityNotes": ""
-    },
-    "backup": {
-      "strategy": [],
-      "rto": "",
-      "rpo": "",
-      "retention": {}
-    }
+    "persistence": { "accessPatterns": [], "indexing": [], "caching": {} },
+    "migrations": { "strategy": "", "versioning": {}, "rollback": {} },
+    "performance": { "optimization": [] },
+    "backup": { "strategy": [], "rto": "", "rpo": "" }
   }
 }
 ```
 
-Use conceptual types only. Compact JSON; references/IDs for repeated structures.
+## Completion gate
 
----
-
-## Input grounding
-
-Ground every decision in epic, ADR, common patterns, and target domain modelling. Align entities and boundaries with domain model.
+Entities consistent with APIs; assumptions documented for all inferred schema decisions.

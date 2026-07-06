@@ -1,149 +1,104 @@
 ---
 name: design-generic-security
 description: >-
-  Enrich the Core Design Model IR with technology-agnostic security design.
-  Load during IR build when epic/ADR require authentication, authorization,
-  roles, API gateway patterns, or security policies. No vendor or framework names.
+  Enrich IR with technology-agnostic security. Primary goal: populate security
+  from requirements or category baselines — never skip because epic omitted
+  security. Document every assumption.
 ---
 
 # Generic Security (IR enrichment)
 
-## When to use
+## Primary goal
 
-Load this skill when building or patching `core_design_model.json` and requirements (epic, ADR, patterns, domain model) imply security concerns.
+Populate `core_design_model.json` → `security` with complete, technology-agnostic authentication, authorization, roles, API protection, and policies — **even when epic/ADR do not mention security explicitly** — using category-appropriate baselines and documented assumptions.
 
-**Output target:** enrich `security` on the IR only — do **not** create `Security.json` or stack-specific security artifacts (the technology adapter maps IR later).
+## Success criteria
+
+- [ ] `security.authentication`, `security.authorization`, `security.roles`, `security.policies` present or explicitly empty with assumption
+- [ ] Roles align with `requirements.actors` when actors exist
+- [ ] API protection reflects `apiOperations` when APIs exist
+- [ ] No vendor or framework names (Keycloak, OAuth product names, etc.)
+- [ ] Every baseline or inferred control recorded in `meta.assumptions[]`
+- [ ] IR file updated; `meta.v` bumped; no `Security.json` emitted
 
 **IR file:** `src/output_workflow/_internal/core_design_model.json`
 
----
+## When to use
 
-## Primary goal
+Load during IR build when epic/ADR imply security **or** when the system exposes APIs, user accounts, or sensitive data (apply baseline even if epic is silent).
 
-Produce comprehensive, technology-agnostic security content in the IR — authentication, authorization, roles, API surface protection, and policies — implementable with any identity provider or security stack.
+## Domain responsibilities
 
----
+### Authentication
+Token/session/certificate patterns; MFA; token lifecycle; federated identity (conceptual); credential policy.
 
-## Responsibilities
+### Authorization
+RBAC, ABAC, PBAC; permissions; resource rules; policy enforcement points.
 
-### 1. Authentication design
-- Generic patterns: token-based, session-based, certificate-based
-- Identity provider patterns: federated identity, SSO (conceptual)
-- MFA requirements
-- Token management and refresh strategies
-- Password policies and credential management
-- **No** vendor names (Keycloak, Cognito, Auth0, etc.)
+### Roles
+Business-term role definitions, hierarchies, assignment patterns.
 
-### 2. Authorization design
-- Models: RBAC, ABAC, PBAC
-- Permission structures and access control
-- Resource-based authorization
-- Policy-based access control
-- Authorization decision points
-- **No** framework-specific syntax
+### API / edge security
+Rate limiting, throttling, API keys, request hardening (generic).
 
-### 3. Roles design
-- Role definitions and hierarchies
-- Role assignment patterns
-- Role permissions and constraints
-- Default roles and lifecycle
-- Dynamic roles when required
-- Express roles in **business terms**
+### Policies
+Compliance **only when stated in ADR**; threat mitigation; audit/logging requirements.
 
-### 4. API gateway / edge security
-- Rate limiting and throttling (generic)
-- API key management patterns
-- Request/response transformation for security
-- Circuit breaker patterns for security resilience
-- **No** gateway product configuration
+## Handling missing or incomplete inputs
 
-### 5. Security policies
-- Compliance requirements when stated in ADR (GDPR, HIPAA, PCI-DSS, SOC2)
-- Threat mitigation strategies
-- Security monitoring and auditing requirements
-- Incident response procedures (high level)
+Security enrichment **must not be skipped** for backend/fullstack APIs without an explicit epic section.
 
----
+| Situation | Baseline to apply |
+|-----------|-------------------|
+| Epic silent on auth | Token-based API auth + RBAC with default roles `anonymous`, `authenticated`, `admin` — `[REVIEW]` |
+| No roles in domain model | Derive from actors and API operations |
+| No compliance in ADR | Omit compliance policies; do not invent GDPR/HIPAA |
+| Public API only | Document public vs protected routes in `authorization.resourceRules` |
+| ADR mandates MFA | Include MFA in authentication; do not downgrade |
+
+Use `clarify` only for mutually exclusive models (e.g. ABAC vs simple RBAC) when ADR is silent and API count > 10.
+
+Record assumptions:
+
+```json
+{
+  "id": "ASM-SEC-001",
+  "topic": "authentication",
+  "assumption": "Bearer token API auth assumed",
+  "reason": "Epic lists REST APIs but no auth section",
+  "confidence": "medium",
+  "impact": "Implementation may need IdP selection",
+  "needsReview": true
+}
+```
 
 ## What you can do
 
-- Design generic authentication and authorization models with clear permission structures
-- Define role hierarchies using business terminology
-- Specify MFA, token lifecycle, federated identity, and SSO at a conceptual level
-- Document API edge security: rate limits, throttling, API keys
-- Generate policy and compliance notes grounded in ADR/epic
-- Create threat mitigation and audit/logging requirements
-- Populate IR `security` with compact, valid JSON structures
-- Preserve all existing IR fields; bump `meta.v` patch on change
+- Design full auth/authz models, roles, API edge controls, audit requirements
+- Populate compact JSON under `security`
+- Preserve all other IR fields
 
 ## What you cannot do
 
-- Specify concrete products ("use Keycloak", "use AWS Cognito")
-- Write production configs, code, or deployment scripts
-- Recommend vendors or make technology selection decisions
-- Emit `Security.json`, `Security.md`, or files outside the IR
-- Invent security requirements not supported by epic/ADR
-- Design controls that violate least privilege or defense-in-depth
-- Assume existing infrastructure without documenting assumptions in `meta.assumptions`
-
----
-
-## How to apply (procedure)
-
-1. Read epic, ADR, common patterns, and domain modelling.
-2. Read existing `core_design_model.json` if present.
-3. Enrich **only** `security` (and related `nfr` / `observability` cross-refs if needed).
-4. Ground every decision in inputs; cite ADR for cross-cutting choices.
-5. If epic has no security requirements, leave `security` minimal or empty — do not invent.
-6. Write updated IR; bump `meta.v`.
-
----
+- Name products (Keycloak, Cognito, Auth0)
+- Write configs, code, or `Security.json`
+- Invent compliance mandates not in ADR
+- Skip security for API backends without documenting intentional public exposure
 
 ## IR output structure
-
-Map domain expertise into `core_design_model.json` → `security`:
 
 ```json
 {
   "security": {
-    "authentication": {
-      "patterns": ["token-based"],
-      "mfa": {},
-      "tokenLifecycle": {},
-      "identityFederation": {},
-      "credentialPolicy": {}
-    },
-    "authorization": {
-      "model": "RBAC",
-      "permissions": [],
-      "resourceRules": [],
-      "policyEnforcement": {}
-    },
-    "roles": [
-      { "id": "ROLE-001", "name": "", "permissions": [], "hierarchy": [] }
-    ],
-    "apiGateway": {
-      "rateLimiting": {},
-      "apiKeys": {},
-      "transformations": {}
-    },
-    "policies": [
-      { "id": "POL-001", "type": "compliance|threat|audit", "summary": "", "requirements": [] }
-    ]
+    "authentication": { "patterns": [], "mfa": {}, "tokenLifecycle": {} },
+    "authorization": { "model": "RBAC", "permissions": [], "resourceRules": [] },
+    "roles": [{ "id": "ROLE-001", "name": "", "permissions": [] }],
+    "apiGateway": { "rateLimiting": {}, "apiKeys": {} },
+    "policies": [{ "id": "POL-001", "type": "", "summary": "", "requirements": [] }]
   }
 }
 ```
 
-Use compact JSON (short keys where clear, no redundant nesting). Align roles with `requirements.actors` and `businessRules` where applicable.
+## Completion gate
 
----
-
-## Input grounding
-
-Ground every decision in:
-- Epic template
-- ADR blueprint
-- Common patterns
-- Target domain modelling
-
-When ADR conflicts with epic, follow ADR and document in `meta.assumptions`.
+`security` populated or consciously empty with assumption; `meta.assumptions` complete.

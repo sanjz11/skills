@@ -1,36 +1,89 @@
 ---
 name: react-adapter
 description: >-
-  Map Core Design Model IR to React (web) internal artifacts. Load when technology_context.profile.skill is react-adapter.
+  Map IR to React (Web) internal artifacts. Primary goal: always produce
+  stack-specific files from IR + technology_context. Proceed with assumptions
+  when IR sections are empty. Load when technology_context.profile.skill is react-adapter.
+---
 
 # React (Web) Adapter
 
-Read `technology_context.json` + `core_design_model.json`. Map generic layers using `profile.layerMapping`. **Do not** emit server-side framework artifacts.
+## Primary goal
+
+Transform `core_design_model.json` into **complete internal React (Web) design artifacts** under `_internal/` — using `technology_context.profile.skill`, `layerMapping`, and `artifacts` — **even when IR sections are partial or epic uploads were missing**.
+
+## Success criteria
+
+- [ ] Read `src/output_workflow/_internal/core_design_model.json` and `src/output_workflow/_internal/technology_context.json` first
+- [ ] Loaded skill matches `technology_context.profile.skill` (react-adapter)
+- [ ] Required profile artifacts written under `src/output_workflow/_internal/`
+- [ ] `legacyLogicMigration` rendered as **TypeScript/JSX** pseudo-code in `.md` files with `// Legacy line N:` traceability
+- [ ] Each JSON artifact includes `meta.techProfile`, `meta.irVersion`, `meta.adapter`
+- [ ] Empty IR sections: skip file OR write minimal stub with `meta.assumptions` — never fail silently
+- [ ] No consolidated deliverables at workflow root
+
+## Inputs
+
+- `src/output_workflow/_internal/core_design_model.json`
+- `src/output_workflow/_internal/technology_context.json`
+- `config/technology-registry.json` (reference)
 
 ## Layer → artifact mapping
 
-| IR layer | React artifacts |
-|----------|-----------------|
+| IR layer | React (Web) artifacts |
+|----------|---------------------------|
 | presentation | Page, Component, Route, layout |
-| business | Custom hook, Context provider, use-case module |
-| data | API client, store slice, query cache |
-| integration | API layer / BFF client, interceptors |
+| business | Custom hook, Context provider |
+| data | API client, store slice |
+| integration | API layer / BFF client |
 | configuration | env config, build config |
 
 ## Outputs
 
-- `src/output_workflow/_internal/Presentation/PresentationDesign.json` — pages, routes, components, state model
-- `src/output_workflow/_internal/Presentation/PresentationDesign.md` + `_Diagrams.mmd`
-- `src/output_workflow/_internal/Application/Design.json` — client layer only (API client, DTOs, error mapping)
-- Skip Security.json, Database.json, MessageDesign.json unless IR sections are non-empty and relevant to the web client
+- `src/output_workflow/_internal/Presentation/PresentationDesign.json`
+- `src/output_workflow/_internal/Presentation/PresentationDesign.md`
+- `src/output_workflow/_internal/Application/Design.json`
+
+## Procedure
+
+1. Read IR and technology context.
+2. Load this skill via skills tool.
+3. Map each non-empty IR layer per `layerMapping`.
+4. Generate openapi/contracts from `apiOperations` when profile includes them.
+5. Map `security`, `data`, `messaging` IR sections to folder JSONs when non-empty and category-relevant.
+6. Write all artifacts; bump `meta.v` on updates.
+
+## Handling missing or incomplete inputs
+
+You must still produce adapter artifacts. IR is the source of truth.
+
+| Situation | What to do |
+|-----------|------------|
+| IR section empty | Skip that artifact file OR emit minimal stub documenting omission in artifact `meta.assumptions` |
+| apiOperations incomplete | Complete from capabilities using RESTful conventions; flag `[REVIEW]` in meta |
+| No legacyLogicMigration | Omit pseudo-code blocks — do not invent legacy |
+| technology_context partial | Re-read registry; never guess a different profile |
+| Epic never uploaded | Rely entirely on IR + technology_context |
+
+Stack-specific: Derive pages from apiOperations + capabilities if epic lacks UI detail.
+
+Use `clarify` only if `technology_context.profileId` conflicts with registry or IR stack hints.
 
 ## Legacy migration
 
-For each `legacyLogicMigration[]` entry: TypeScript/JSX pseudo-code in PresentationDesign.md with traceability comments. Server-side legacy logic: document as backend API dependency, not server framework code.
+For each `legacyLogicMigration[]` entry: **TypeScript/JSX** pseudo-code in Design/Presentation `.md` with traceability comments.
 
-## Rules
+## Naming
 
-- TypeScript/JSX for client business logic
-- Reference `apiOperations` for API client method design
-- camelCase for functions/variables; PascalCase for components
-- Component composition and state-management patterns per `technology_context.patterns`
+camelCase members; PascalCase components.
+
+## Do not
+
+- Write `consolidated_design.md` or `consolidated_design.json`
+- Load a different adapter skill than `profile.skill`
+- Invent APIs or rules absent from IR (infer only with `meta.assumptions`)
+- Use a stack that does not match `technology_context.profileId` (react)
+
+## Completion gate
+
+All applicable outputs exist under `_internal/`; assumptions recorded for every inferred design element.

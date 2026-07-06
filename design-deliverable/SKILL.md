@@ -1,54 +1,63 @@
 ---
 name: design-deliverable
 description: >-
-  Produce the shareable design deliverables from IR and internal adapted
-  artifacts. Load when consolidating into stakeholder-facing outputs (max 2
-  files at workflow root).
+  Produce consolidated stakeholder deliverables. Primary goal: always output
+  two self-contained files from whatever internal artifacts exist. Fill gaps
+  from IR with documented assumptions.
 ---
 
 # Design Deliverable
 
-## Purpose
+## Primary goal
 
-Create **only** the files stakeholders share externally (maximum 2 files at workflow root).
+Always produce **exactly two** shareable files at `src/output_workflow/` root — `consolidated_design.md` and `consolidated_design.json` — self-contained and consistent, built from whatever exists in `_internal/`, without requiring stakeholders to open subfolders.
+
+## Success criteria
+
+- [ ] `consolidated_design.md` exists — complete human-readable design
+- [ ] `consolidated_design.json` exists — valid JSON aligned with `.md`
+- [ ] No third shareable file at workflow root
+- [ ] Stack, APIs, business rules, legacy migration (if in IR) appear in `.md`
+- [ ] Sections missing from internal artifacts are either omitted with note in `meta.assumptions` or filled from IR with `[REVIEW]` flag
+- [ ] `.md` and `.json` do not contradict IR (IR wins on conflict)
 
 ## Mandatory outputs
 
-1. **`src/output_workflow/consolidated_design.md`** — complete human-readable design:
-   - Executive summary
-   - Technology stack (from technology_context)
-   - Requirements and capabilities
-   - Business rules and legacy logic migration (full pseudo-code from adapter)
-   - Architecture and layers (generic + adapted)
-   - API contract summary (+ path/method summary when OpenAPI exists internally)
-   - Security, data, messaging (only sections present in IR)
-   - NFR, error handling, observability
-   - Mermaid diagrams inline
+### 1. `consolidated_design.md`
 
-2. **`src/output_workflow/consolidated_design.json`** — compact machine-readable bundle:
-   - `technology` (from technology_context)
-   - `coreModelSummary` (key IR fields)
-   - `adaptedDesign` (merged internal adapter JSON sections)
-   - `apiSummary` when applicable
-   - `meta.ts`, `meta.v`
+Executive summary, technology stack, requirements, business rules, legacy migration (full pseudo-code from adapter), architecture, APIs, security/data/messaging (if in IR), NFR, Mermaid diagrams.
 
-## Rules
+### 2. `consolidated_design.json`
 
-1. Read from `src/output_workflow/_internal/` (IR, context, adapter outputs).
-2. **Do not** require stakeholders to open internal subfolders — fold essential content into the two files.
-3. Keep `_internal/` as workspace-only; deliverables at `src/output_workflow/` root.
-4. If OpenAPI exists in `_internal/`, summarize in `.md`; optional `openapi` key in `.json` (not a third file).
-5. **UPDATE mode:** patch only sections named in change requirements.
+`technology`, `coreModelSummary`, `adaptedDesign`, `apiSummary`, `meta`.
 
-## Validation alignment
+## Procedure
 
-Quality checks expect:
-- Both deliverables exist and align with IR
-- Legacy migration in IR appears in `.md`
-- At most two shareable files at workflow root
+1. Read all of `src/output_workflow/_internal/`.
+2. Merge IR + adapted artifacts; IR is semantic source of truth.
+3. Fold internal folder content into the two files.
+4. UPDATE: patch only sections named in change requirements.
+
+## Handling missing or incomplete inputs
+
+You must still ship both deliverables.
+
+| Situation | What to do |
+|-----------|------------|
+| Adapter artifacts missing | Consolidate from IR + `technology_context` only; note gap in `meta.assumptions` |
+| IR section empty | Omit section or include "Not in scope per assumptions" with reference to `meta.assumptions` |
+| OpenAPI missing | Build API summary from IR `apiOperations` |
+| Legacy pseudo-code missing | Include IR excerpts + note adapter gap; flag `[REVIEW]` |
+| Partial internal tree | Include what exists; never reference paths stakeholders cannot access |
+
+Use `clarify` only if deliverable purpose (audience, compliance packaging) is unknown and would change document structure materially.
 
 ## Do not
 
-- Create more than 2 shareable files at workflow root
-- Omit legacy migration detail from consolidated_design.md
-- Contradict IR — IR wins; document conflicts in `meta`
+- Create more than 2 shareable root files
+- Omit legacy detail that exists in internal `.md` files
+- Say "see `_internal/` folder" — inline essential content
+
+## Completion gate
+
+Two root files exist, cross-validated, assumptions documented for any synthesized content.
