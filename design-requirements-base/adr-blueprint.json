@@ -1,0 +1,136 @@
+{
+  "version": "1.0",
+  "description": "Canonical ADR keys for the design workflow. When adr_blueprint upload is missing or partial, agents synthesize values from defaults + category + profile overrides. User uploads override synthesized values.",
+  "synthesisOutput": "src/output_workflow/_internal/requirements_context.json",
+  "mergeRule": "uploaded > profile.adrDefaults > categoryDefaults > key.default",
+  "keys": {
+    "architecture_style": {
+      "label": "Architecture style",
+      "default": "layered",
+      "categoryDefaults": {
+        "backend": "layered",
+        "frontend": "component-based",
+        "mobile": "component-based",
+        "integration": "api-led-connectivity",
+        "fullstack": "layered",
+        "cloud": "infrastructure-as-code",
+        "data": "pipeline"
+      },
+      "description": "Overall structural style for the solution."
+    },
+    "api_style": {
+      "label": "API style",
+      "default": "rest",
+      "categoryDefaults": {
+        "backend": "rest",
+        "frontend": "rest-client",
+        "mobile": "rest-client",
+        "integration": "rest",
+        "fullstack": "rest"
+      },
+      "description": "Primary API paradigm (rest, graphql, rpc, event-driven)."
+    },
+    "auth_model": {
+      "label": "Authentication model",
+      "default": "token-based",
+      "categoryDefaults": {
+        "backend": "token-based",
+        "frontend": "token-based",
+        "mobile": "token-based",
+        "integration": "oauth2-delegation"
+      },
+      "description": "How callers authenticate (token-based, session, mTLS, api-key)."
+    },
+    "authorization_model": {
+      "label": "Authorization model",
+      "default": "rbac",
+      "description": "RBAC, ABAC, or hybrid."
+    },
+    "data_persistence": {
+      "label": "Data persistence approach",
+      "default": "relational",
+      "categoryDefaults": {
+        "backend": "relational",
+        "mobile": "local-store",
+        "frontend": "client-cache",
+        "data": "warehouse"
+      },
+      "description": "Conceptual persistence (relational, document, event-store, local-store)."
+    },
+    "messaging_model": {
+      "label": "Messaging model",
+      "default": "sync-only",
+      "categoryDefaults": {
+        "integration": "event-driven",
+        "backend": "sync-only"
+      },
+      "description": "sync-only, event-driven, or hybrid."
+    },
+    "integration_style": {
+      "label": "Integration style",
+      "default": "api",
+      "categoryDefaults": {
+        "integration": "api-led",
+        "mobile": "bff"
+      },
+      "description": "How external systems connect."
+    },
+    "deployment_model": {
+      "label": "Deployment model",
+      "default": "container",
+      "categoryDefaults": {
+        "cloud": "managed-service",
+        "mobile": "app-store"
+      },
+      "description": "container, serverless, vm, managed-service, on-premise."
+    },
+    "observability": {
+      "label": "Observability baseline",
+      "default": "logs-metrics-traces",
+      "description": "Logging, metrics, tracing expectations."
+    },
+    "error_handling": {
+      "label": "Error handling strategy",
+      "default": "structured-errors",
+      "description": "Problem details, error codes, retry guidance."
+    },
+    "security_baseline": {
+      "label": "Security baseline",
+      "default": "tls-encryption-least-privilege",
+      "description": "Minimum security controls expected."
+    },
+    "testing_strategy": {
+      "label": "Testing strategy",
+      "default": "unit-integration-contract",
+      "description": "Test levels expected in downstream implementation phase."
+    },
+    "contract_format": {
+      "label": "Primary contract format",
+      "default": "openapi",
+      "categoryDefaults": {
+        "integration": "raml"
+      },
+      "description": "openapi, raml, graphql-schema, asyncapi."
+    },
+    "legacy_migration_approach": {
+      "label": "Legacy migration approach",
+      "default": "strangler-fig",
+      "description": "How legacy logic is migrated (big-bang, strangler-fig, parallel-run)."
+    },
+    "nfr_availability": {
+      "label": "Availability target",
+      "default": "99.9",
+      "description": "SLO-style availability when not specified in epic."
+    },
+    "nfr_latency_p99_ms": {
+      "label": "Latency P99 (ms)",
+      "default": "500",
+      "description": "Default API latency budget when epic silent."
+    },
+    "compliance": {
+      "label": "Compliance requirements",
+      "default": "none-stated",
+      "description": "Only override when epic/ADR states compliance (GDPR, HIPAA, etc.)."
+    }
+  }
+}

@@ -13,10 +13,23 @@ description: >-
 
 Always produce `src/output_workflow/_internal/requirements_context.json` with a **complete ADR key set** — merging uploaded ADR, epic hints, category defaults, and profile `adrDefaults` — so downstream steps never skip work because ADR was not uploaded.
 
+## Bundled file
+
+`adr-blueprint.json` — ADR keys, defaults, category defaults (in this skill repo folder).
+
+## Bootstrap
+
+1. Load this skill via `skills` tool.
+2. Read bundled `adr-blueprint.json`.
+3. Write to `src/output_workflow/_internal/_config/adr-blueprint.json`.
+
+Use bootstrapped copy at `_internal/_config/adr-blueprint.json` — not `config/`.
+
 ## Success criteria
 
+- [ ] `_internal/_config/adr-blueprint.json` bootstrapped from this skill
 - [ ] `requirements_context.json` exists under `_internal/`
-- [ ] Every key in `config/adr-blueprint.json` → `keys` has a resolved value
+- [ ] Every key in `adr-blueprint.json` → `keys` has a resolved value
 - [ ] `sources` documents origin per key: `uploaded` | `profile` | `category` | `default` | `inferred`
 - [ ] `meta.synthesized` is `true` when adr_blueprint upload was missing or partial
 - [ ] User upload values **always win** over defaults
@@ -30,8 +43,8 @@ Load at the **start** of technology context resolution and **before** IR build.
 
 | Source | Path |
 |--------|------|
-| ADR blueprint schema | `config/adr-blueprint.json` |
-| Technology registry | `config/technology-registry.json` |
+| ADR blueprint | `_internal/_config/adr-blueprint.json` (bootstrap from this skill) |
+| Technology registry | `_internal/_config/technology-registry.json` (from design-technology-base skill) |
 | Resolved profile | `src/output_workflow/_internal/technology_context.json` (when available) |
 | User ADR upload | epic inputs `adr_blueprint` |
 | Epic / patterns / domain | Design Phase Inputs |

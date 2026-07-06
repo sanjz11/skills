@@ -1,0 +1,57 @@
+{
+  "$schema": "Core Design Model — technology-independent intermediate representation (IR)",
+  "version": "1.0",
+  "description": "All generic design agents read/write this model. Technology Adapter maps IR → stack-specific artifacts.",
+  "structure": {
+    "meta": { "ts": "ISO8601", "v": "1.0", "irVersion": "1.0" },
+    "requirements": {
+      "functional": [],
+      "actors": [],
+      "userStories": []
+    },
+    "capabilities": [],
+    "businessFlows": [],
+    "businessRules": [],
+    "legacyLogicMigration": [],
+    "boundedContexts": [],
+    "apiOperations": [],
+    "dataEntities": [],
+    "integrations": [],
+    "layers": {
+      "presentation": [],
+      "business": [],
+      "data": [],
+      "integration": [],
+      "configuration": []
+    },
+    "security": {
+      "authentication": {},
+      "authorization": {},
+      "roles": [],
+      "policies": []
+    },
+    "messaging": {
+      "events": [],
+      "commands": [],
+      "patterns": {},
+      "reliability": {}
+    },
+    "data": {
+      "entities": [],
+      "relationships": [],
+      "migrations": {},
+      "persistence": {}
+    },
+    "nfr": {},
+    "errorModel": {},
+    "observability": {},
+    "deployment": {}
+  },
+  "rules": [
+    "No technology names in IR (no Controller, Screen, Flow, @Service)",
+    "Use generic layer assignments: presentation, business, data, integration, configuration",
+    "Business rules use BR-ID and business language only",
+    "Legacy migration stores source excerpt language in legacyLogicMigration[].sourceLanguage — not Java",
+    "API operations are resource-oriented: method, path, operationId, request, response, errors"
+  ]
+}

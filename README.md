@@ -7,7 +7,10 @@ Technology-agnostic design pipeline skills for Reunity.
 - **Generic skills** — IR, security, data, messaging (no stack names)
 - **Adapter skills + references/** — stack-specific patterns
 - **config/adr-blueprint.json** — ADR keys + defaults when upload missing
-- **config/technology-registry.json** — profiles, adrDefaults, references
+- Bootstrapped at runtime to `src/output_workflow/_internal/_config/`
+- **design-technology-base** bundles `technology-registry.json`
+- **design-requirements-base** bundles `adr-blueprint.json`
+- **design-generic-core** bundles `core-design-model-schema.json`
 
 ## Skills
 

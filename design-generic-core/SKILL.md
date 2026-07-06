@@ -26,11 +26,16 @@ Produce a **complete, technology-independent** Core Design Model — `core_desig
 
 Load when creating or updating the canonical IR **before** stack-specific adaptation.
 
-Read `config/core-design-model-schema.json` first.
+## Bootstrap
+
+1. Load this skill via `skills` tool.
+2. Read bundled `core-design-model-schema.json`.
+3. Write to `src/output_workflow/_internal/_config/core-design-model-schema.json`.
 
 ## Procedure
 
-1. Read all available inputs (epic, ADR, patterns, domain model) and existing workspace IR.
+1. Ensure `_internal/_config/` is bootstrapped (registry, adr-blueprint, schema).
+2. Read all available inputs and existing IR.
 2. Load `design-generic-security`, `design-generic-data`, `design-generic-messaging` when requirements or category imply those domains.
 3. Extract capabilities, actors, flows, business rules, APIs, data, security, messaging, NFR, errors, deployment.
 4. Assign elements to generic layers.
@@ -74,7 +79,7 @@ Record every inference in `meta.assumptions[]` with `id`, `topic`, `assumption`,
 
 | Layer | Tune when… | Location |
 |-------|------------|----------|
-| ADR defaults | Stack needs different auth/API defaults | `technology-registry.json` → `adrDefaults` |
+| ADR defaults | Stack needs different auth/API defaults | `technology-registry.json` in design-technology-base skill |
 | Requirements | ADR synthesis rules | `design-requirements-base` skill |
 | IR content | Domain depth | generic skills (not workflow) |
 | Stack output | Java/React layout wrong | adapter `references/` only |

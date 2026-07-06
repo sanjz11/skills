@@ -1,0 +1,107 @@
+{
+  "version": "1.0",
+  "strategy": "Personas hold goals and guardrails. Workflow prompts orchestrate only. Skills hold domain depth. Registry + adr-blueprint hold defaults. Adapter references hold stack patterns. Tune skills/references per stack — never IR schema or generic skills.",
+  "agents": {
+    "technology-context": {
+      "label": "Technology Context Builder",
+      "primaryGoal": "Resolve profile and write technology_context.json; never block on missing ADR.",
+      "skills": ["design-technology-base", "design-requirements-base"],
+      "mustRead": ["config/technology-registry.json", "config/adr-blueprint.json"],
+      "outputs": ["src/output_workflow/_internal/technology_context.json"],
+      "bestPractices": [
+        "Fuzzy-match stack aliases before falling back to category default",
+        "Copy layerMapping and references from registry profile verbatim",
+        "If ADR missing, still write context — ADR synthesis is requirements step",
+        "Record fuzzy matches in meta.assumptions"
+      ]
+    },
+    "core-ir": {
+      "label": "Core Design Model",
+      "primaryGoal": "Synthesize requirements if needed, then produce complete generic IR in one pass.",
+      "skills": [
+        "design-requirements-base",
+        "design-generic-core",
+        "design-generic-security",
+        "design-generic-data",
+        "design-generic-messaging",
+        "design-generic-enricher"
+      ],
+      "mustRead": [
+        "config/core-design-model-schema.json",
+        "config/adr-blueprint.json",
+        "src/output_workflow/_internal/requirements_context.json",
+        "src/output_workflow/_internal/technology_context.json"
+      ],
+      "outputs": [
+        "src/output_workflow/_internal/requirements_context.json",
+        "src/output_workflow/_internal/core_design_model.json",
+        "src/output_workflow/_internal/core_design_model.md"
+      ],
+      "bestPractices": [
+        "Always run ADR synthesis before IR when requirements_context missing or adr upload empty",
+        "Apply security/data/messaging skills even when epic omits those sections",
+        "Use requirements_context.adr as authoritative when upload absent",
+        "Never emit stack-specific terms in IR"
+      ]
+    },
+    "technology-adapter": {
+      "label": "Technology Adapter",
+      "primaryGoal": "Map IR to stack artifacts using adapter skill + profile references.",
+      "skills": ["*-adapter from registry"],
+      "mustRead": [
+        "src/output_workflow/_internal/core_design_model.json",
+        "src/output_workflow/_internal/technology_context.json",
+        "config/technology-registry.json"
+      ],
+      "outputs": ["src/output_workflow/_internal/**"],
+      "bestPractices": [
+        "Load only technology_context.profile.skill",
+        "Load each path in profile.references via skills tool",
+        "Render IR into reference template shapes — do not invent layout",
+        "Tune stack quality by editing references, not workflow prompts"
+      ]
+    },
+    "design-deliverable": {
+      "label": "Design Deliverable",
+      "primaryGoal": "Two self-contained stakeholder files from internal workspace.",
+      "skills": ["design-deliverable"],
+      "mustRead": ["src/output_workflow/_internal/"],
+      "outputs": [
+        "src/output_workflow/consolidated_design.md",
+        "src/output_workflow/consolidated_design.json"
+      ],
+      "bestPractices": [
+        "Include synthesized ADR decisions in executive summary when upload was missing",
+        "Flag [SYNTHESIZED] and [REVIEW] assumptions prominently",
+        "IR wins on conflicts"
+      ]
+    },
+    "validation": {
+      "label": "Validation Design",
+      "primaryGoal": "JSON quality gate; do not redesign.",
+      "skills": ["design-deliverable"],
+      "mustRead": [
+        "src/output_workflow/consolidated_design.md",
+        "src/output_workflow/consolidated_design.json",
+        "src/output_workflow/_internal/core_design_model.json",
+        "src/output_workflow/_internal/requirements_context.json"
+      ],
+      "outputs": ["validation JSON report in chat"],
+      "bestPractices": [
+        "CRITICAL if deliverables missing — not if ADR was synthesized",
+        "Verify requirements_context documents all synthesized ADR keys",
+        "AUTO-fix only deterministic formatting issues"
+      ]
+    }
+  },
+  "phasesFuture": {
+    "implementation": {
+      "pattern": "generic implementation persona + {profile.implementationSkill} + references/implementation/",
+      "registryField": "implementationSkill"
+    },
+    "testing": {
+      "pattern": "generic testing persona + {profile.testingSkill} + references/testing/",
+      "registryField": "testingSkill"
+    }
+  }
+}

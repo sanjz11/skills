@@ -26,7 +26,7 @@ Transform `core_design_model.json` into **complete internal Angular design artif
 
 - `src/output_workflow/_internal/core_design_model.json`
 - `src/output_workflow/_internal/technology_context.json`
-- `config/technology-registry.json` (reference)
+- `src/output_workflow/_internal/_config/technology-registry.json`
 
 ## Layer → artifact mapping
 
@@ -100,7 +100,7 @@ Load each reference file from this adapter skill folder. **Render IR into refere
 | Stack conventions | This SKILL.md + references | step orchestration prompts |
 | ADR defaults | registry `adrDefaults` | adr-blueprint keys list |
 
-Future phases: `implementationSkill` + `testingSkill` in registry (see `config/agent-contracts.json`).
+Future phases: `implementationSkill` + `testingSkill` in bootstrapped registry (see `agent-contracts.json` in design-technology-base skill).
 
 ## Do not
 

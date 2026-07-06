@@ -1,0 +1,664 @@
+{
+  "version": "2.0",
+  "defaultProfile": "generic-backend",
+  "genericLayers": [
+    "presentation",
+    "business",
+    "data",
+    "integration",
+    "configuration"
+  ],
+  "categories": {
+    "backend": {
+      "label": "Backend / API Services",
+      "contractFormats": [
+        "openapi"
+      ]
+    },
+    "frontend": {
+      "label": "Web Frontend",
+      "contractFormats": [
+        "openapi",
+        "graphql"
+      ]
+    },
+    "mobile": {
+      "label": "Mobile Applications",
+      "contractFormats": [
+        "openapi",
+        "graphql"
+      ]
+    },
+    "integration": {
+      "label": "Integration / iPaaS",
+      "contractFormats": [
+        "raml",
+        "openapi",
+        "asyncapi"
+      ]
+    },
+    "cloud": {
+      "label": "Cloud / Infrastructure",
+      "contractFormats": [
+        "openapi",
+        "terraform"
+      ]
+    },
+    "fullstack": {
+      "label": "Full-Stack Application",
+      "contractFormats": [
+        "openapi"
+      ]
+    },
+    "data": {
+      "label": "Data Platform",
+      "contractFormats": [
+        "openapi"
+      ]
+    }
+  },
+  "profiles": {
+    "java-spring": {
+      "displayName": "Java / Spring Boot",
+      "category": "backend",
+      "framework": "Spring Boot",
+      "aliases": [
+        "java",
+        "spring",
+        "spring boot",
+        "springboot",
+        "jvm"
+      ],
+      "adapter": "java-adapter",
+      "skill": "java-adapter",
+      "architecture": "layered-ddd",
+      "namingConvention": "camelCase",
+      "patterns": [
+        "repository",
+        "dependency-injection",
+        "rest"
+      ],
+      "layerMapping": {
+        "presentation": [
+          "controller",
+          "dto",
+          "request-validator"
+        ],
+        "business": [
+          "service",
+          "domain-service",
+          "aggregate"
+        ],
+        "data": [
+          "repository",
+          "entity",
+          "mapper"
+        ],
+        "integration": [
+          "client",
+          "message-listener"
+        ],
+        "configuration": [
+          "application-config",
+          "security-config"
+        ]
+      },
+      "artifacts": [
+        "Design.json",
+        "Design.md",
+        "openapi.yaml"
+      ],
+      "testing": [
+        "JUnit",
+        "Mockito"
+      ],
+      "documentation": [
+        "OpenAPI"
+      ],
+      "adrDefaults": {
+        "architecture_style": "layered-ddd",
+        "api_style": "rest",
+        "auth_model": "token-based",
+        "data_persistence": "relational",
+        "messaging_model": "sync-only",
+        "contract_format": "openapi",
+        "testing_strategy": "unit-integration-contract-junit"
+      },
+      "references": [
+        "references/controller-pattern.md",
+        "references/repository-pattern.md",
+        "references/Design-json-shape.json"
+      ],
+      "implementationSkill": "java-implementation",
+      "testingSkill": "java-testing",
+      "bestPractices": [
+        "Constructor injection only; avoid field injection",
+        "OpenAPI 3.1 generated from IR apiOperations",
+        "Transactional boundaries on service layer not controllers"
+      ]
+    },
+    "react-native": {
+      "displayName": "React Native",
+      "category": "mobile",
+      "framework": "React Native",
+      "aliases": [
+        "react native",
+        "react-native",
+        "rn",
+        "expo"
+      ],
+      "adapter": "react-native-adapter",
+      "skill": "react-native-adapter",
+      "architecture": "component-based",
+      "namingConvention": "camelCase",
+      "patterns": [
+        "hooks",
+        "navigation",
+        "state-management"
+      ],
+      "layerMapping": {
+        "presentation": [
+          "screen",
+          "component",
+          "navigation"
+        ],
+        "business": [
+          "hook",
+          "use-case"
+        ],
+        "data": [
+          "api-client",
+          "repository",
+          "local-store"
+        ],
+        "integration": [
+          "api-layer"
+        ],
+        "configuration": [
+          "env-config",
+          "build-config"
+        ]
+      },
+      "artifacts": [
+        "PresentationDesign.json",
+        "PresentationDesign.md",
+        "Design.json"
+      ],
+      "testing": [
+        "Jest",
+        "React Native Testing Library"
+      ],
+      "documentation": [
+        "Component hierarchy"
+      ],
+      "adrDefaults": {
+        "architecture_style": "component-based",
+        "api_style": "rest-client",
+        "auth_model": "token-based",
+        "data_persistence": "local-store",
+        "messaging_model": "sync-only",
+        "integration_style": "bff"
+      },
+      "references": [
+        "references/screen-navigation-pattern.md",
+        "references/PresentationDesign-json-shape.json"
+      ],
+      "implementationSkill": "react-native-implementation",
+      "testingSkill": "react-native-testing",
+      "bestPractices": [
+        "Screens map to IR presentation layer capabilities",
+        "No server-side code in presentation artifacts"
+      ]
+    },
+    "mulesoft": {
+      "displayName": "MuleSoft Anypoint",
+      "category": "integration",
+      "framework": "Mule 4",
+      "aliases": [
+        "mulesoft",
+        "mule",
+        "anypoint"
+      ],
+      "adapter": "mulesoft-adapter",
+      "skill": "mulesoft-adapter",
+      "architecture": "api-led-connectivity",
+      "namingConvention": "kebab-case",
+      "patterns": [
+        "api-led",
+        "connectors",
+        "error-handler"
+      ],
+      "layerMapping": {
+        "presentation": [
+          "experience-api"
+        ],
+        "business": [
+          "process-flow",
+          "subflow"
+        ],
+        "data": [
+          "system-api"
+        ],
+        "integration": [
+          "connector",
+          "transform-message"
+        ],
+        "configuration": [
+          "policy",
+          "properties"
+        ]
+      },
+      "artifacts": [
+        "IntegrationDesign.json",
+        "IntegrationDesign.md",
+        "integration-apis.raml"
+      ],
+      "testing": [
+        "MUnit"
+      ],
+      "documentation": [
+        "RAML",
+        "Flow diagrams"
+      ],
+      "adrDefaults": {
+        "architecture_style": "api-led-connectivity",
+        "api_style": "rest",
+        "messaging_model": "event-driven",
+        "integration_style": "api-led",
+        "contract_format": "raml"
+      },
+      "references": [
+        "references/api-led-pattern.md",
+        "references/IntegrationDesign-json-shape.json"
+      ],
+      "implementationSkill": "mulesoft-implementation",
+      "testingSkill": "mulesoft-testing",
+      "bestPractices": [
+        "Experience / Process / System API separation",
+        "DataWeave for transforms; error handlers on all flows"
+      ]
+    },
+    "react": {
+      "displayName": "React (Web)",
+      "category": "frontend",
+      "framework": "React",
+      "aliases": [
+        "react",
+        "reactjs",
+        "next.js",
+        "nextjs"
+      ],
+      "adapter": "react-adapter",
+      "skill": "react-adapter",
+      "architecture": "component-based",
+      "namingConvention": "camelCase",
+      "patterns": [
+        "component-composition",
+        "state-management"
+      ],
+      "layerMapping": {
+        "presentation": [
+          "page",
+          "component",
+          "route"
+        ],
+        "business": [
+          "hook",
+          "context"
+        ],
+        "data": [
+          "api-client",
+          "store"
+        ],
+        "integration": [
+          "api-layer"
+        ],
+        "configuration": [
+          "env-config"
+        ]
+      },
+      "artifacts": [
+        "PresentationDesign.json",
+        "PresentationDesign.md"
+      ],
+      "testing": [
+        "Jest",
+        "Testing Library"
+      ],
+      "documentation": [
+        "Component hierarchy"
+      ],
+      "adrDefaults": {
+        "architecture_style": "component-based",
+        "api_style": "rest-client",
+        "data_persistence": "client-cache"
+      },
+      "references": [
+        "references/page-component-pattern.md",
+        "references/PresentationDesign-json-shape.json"
+      ],
+      "implementationSkill": "react-implementation",
+      "testingSkill": "react-testing",
+      "bestPractices": [
+        "Pages from routes in IR",
+        "Hooks for business logic"
+      ]
+    },
+    "angular": {
+      "displayName": "Angular",
+      "category": "frontend",
+      "framework": "Angular",
+      "aliases": [
+        "angular"
+      ],
+      "adapter": "angular-adapter",
+      "skill": "angular-adapter",
+      "architecture": "module-based",
+      "namingConvention": "camelCase",
+      "patterns": [
+        "modules",
+        "rxjs",
+        "dependency-injection"
+      ],
+      "layerMapping": {
+        "presentation": [
+          "component",
+          "module",
+          "routing"
+        ],
+        "business": [
+          "service"
+        ],
+        "data": [
+          "repository",
+          "http-client"
+        ],
+        "integration": [
+          "interceptor"
+        ],
+        "configuration": [
+          "environment"
+        ]
+      },
+      "artifacts": [
+        "PresentationDesign.json",
+        "PresentationDesign.md"
+      ],
+      "testing": [
+        "Jasmine",
+        "Karma"
+      ],
+      "documentation": [
+        "Component hierarchy"
+      ],
+      "adrDefaults": {
+        "architecture_style": "module-based",
+        "api_style": "rest-client",
+        "data_persistence": "client-cache"
+      },
+      "references": [
+        "references/module-routing-pattern.md",
+        "references/PresentationDesign-json-shape.json"
+      ],
+      "implementationSkill": "angular-implementation",
+      "testingSkill": "angular-testing",
+      "bestPractices": [
+        "Feature modules per bounded context",
+        "RxJS for async streams"
+      ]
+    },
+    "nodejs": {
+      "displayName": "Node.js / TypeScript",
+      "category": "backend",
+      "framework": "NestJS",
+      "aliases": [
+        "node",
+        "nodejs",
+        "nestjs",
+        "express"
+      ],
+      "adapter": "nodejs-adapter",
+      "skill": "nodejs-adapter",
+      "architecture": "layered",
+      "namingConvention": "camelCase",
+      "patterns": [
+        "middleware",
+        "dependency-injection"
+      ],
+      "layerMapping": {
+        "presentation": [
+          "route",
+          "controller",
+          "dto"
+        ],
+        "business": [
+          "service"
+        ],
+        "data": [
+          "repository",
+          "entity"
+        ],
+        "integration": [
+          "client"
+        ],
+        "configuration": [
+          "config-module"
+        ]
+      },
+      "artifacts": [
+        "Design.json",
+        "openapi.yaml"
+      ],
+      "testing": [
+        "Jest"
+      ],
+      "documentation": [
+        "OpenAPI"
+      ],
+      "adrDefaults": {
+        "architecture_style": "layered",
+        "api_style": "rest",
+        "data_persistence": "relational",
+        "contract_format": "openapi"
+      },
+      "references": [
+        "references/nestjs-module-pattern.md",
+        "references/Design-json-shape.json"
+      ],
+      "implementationSkill": "nodejs-implementation",
+      "testingSkill": "nodejs-testing",
+      "bestPractices": [
+        "NestJS modules by bounded context",
+        "DTO validation at controller"
+      ]
+    },
+    "python": {
+      "displayName": "Python",
+      "category": "backend",
+      "framework": "FastAPI",
+      "aliases": [
+        "python",
+        "fastapi",
+        "django",
+        "flask"
+      ],
+      "adapter": "python-adapter",
+      "skill": "python-adapter",
+      "architecture": "layered",
+      "namingConvention": "snake_case",
+      "patterns": [
+        "repository",
+        "pydantic"
+      ],
+      "layerMapping": {
+        "presentation": [
+          "router",
+          "schema"
+        ],
+        "business": [
+          "service"
+        ],
+        "data": [
+          "repository",
+          "model"
+        ],
+        "integration": [
+          "client"
+        ],
+        "configuration": [
+          "settings"
+        ]
+      },
+      "artifacts": [
+        "Design.json",
+        "openapi.yaml"
+      ],
+      "testing": [
+        "pytest"
+      ],
+      "documentation": [
+        "OpenAPI"
+      ],
+      "adrDefaults": {
+        "architecture_style": "layered",
+        "api_style": "rest",
+        "data_persistence": "relational",
+        "contract_format": "openapi"
+      },
+      "references": [
+        "references/fastapi-router-pattern.md",
+        "references/Design-json-shape.json"
+      ],
+      "implementationSkill": "python-implementation",
+      "testingSkill": "python-testing",
+      "bestPractices": [
+        "Pydantic schemas at router boundary",
+        "snake_case modules"
+      ]
+    },
+    "dotnet": {
+      "displayName": ".NET / ASP.NET Core",
+      "category": "backend",
+      "framework": "ASP.NET Core",
+      "aliases": [
+        "dotnet",
+        ".net",
+        "c#",
+        "aspnet"
+      ],
+      "adapter": "dotnet-adapter",
+      "skill": "dotnet-adapter",
+      "architecture": "clean-architecture",
+      "namingConvention": "PascalCase",
+      "patterns": [
+        "repository",
+        "mediator"
+      ],
+      "layerMapping": {
+        "presentation": [
+          "controller",
+          "dto"
+        ],
+        "business": [
+          "service",
+          "handler"
+        ],
+        "data": [
+          "repository",
+          "entity"
+        ],
+        "integration": [
+          "client"
+        ],
+        "configuration": [
+          "appsettings"
+        ]
+      },
+      "artifacts": [
+        "Design.json",
+        "openapi.yaml"
+      ],
+      "testing": [
+        "xUnit"
+      ],
+      "documentation": [
+        "OpenAPI"
+      ],
+      "adrDefaults": {
+        "architecture_style": "clean-architecture",
+        "api_style": "rest",
+        "data_persistence": "relational",
+        "contract_format": "openapi"
+      },
+      "references": [
+        "references/aspnet-controller-pattern.md",
+        "references/Design-json-shape.json"
+      ],
+      "implementationSkill": "dotnet-implementation",
+      "testingSkill": "dotnet-testing",
+      "bestPractices": [
+        "MediatR for complex handlers",
+        "FluentValidation on DTOs"
+      ]
+    },
+    "generic-backend": {
+      "displayName": "Generic Backend",
+      "category": "backend",
+      "framework": null,
+      "aliases": [
+        "backend",
+        "generic",
+        "api"
+      ],
+      "adapter": "generic-adapter",
+      "skill": "generic-adapter",
+      "architecture": "layered",
+      "namingConvention": "camelCase",
+      "patterns": [
+        "layered",
+        "rest"
+      ],
+      "layerMapping": {
+        "presentation": [
+          "api-surface"
+        ],
+        "business": [
+          "business-logic"
+        ],
+        "data": [
+          "data-access"
+        ],
+        "integration": [
+          "external-integration"
+        ],
+        "configuration": [
+          "configuration"
+        ]
+      },
+      "artifacts": [
+        "Design.json",
+        "openapi.yaml"
+      ],
+      "testing": [],
+      "documentation": [
+        "OpenAPI"
+      ],
+      "adrDefaults": {
+        "architecture_style": "layered",
+        "api_style": "rest"
+      },
+      "references": [
+        "references/generic-layered-pattern.md",
+        "references/Design-json-shape.json"
+      ],
+      "implementationSkill": "generic-implementation",
+      "testingSkill": "generic-testing",
+      "bestPractices": [
+        "Use layerMapping labels literally",
+        "No framework annotations"
+      ]
+    }
+  },
+  "adrBlueprint": "config/adr-blueprint.json",
+  "agentContracts": "config/agent-contracts.json"
+}
