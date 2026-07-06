@@ -1,6 +1,6 @@
 # Design Workflow Skills
 
-Public skills repo for Reunity Design Workflow V6.
+Technology-agnostic design pipeline skills for Reunity.
 
 ## Skills
 
@@ -21,4 +21,4 @@ Public skills repo for Reunity Design Workflow V6.
 - `python-adapter`
 - `dotnet-adapter`
 
-Each folder contains `SKILL.md` loaded by workflow agents from `github.com/sanjz11/skills`.
+Each folder contains `SKILL.md` loaded from `github.com/sanjz11/skills`.

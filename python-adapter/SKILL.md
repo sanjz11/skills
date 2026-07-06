@@ -1,9 +1,7 @@
 ---
 name: python-adapter
 description: >-
-  Map Core Design Model IR to Python / FastAPI design artifacts. Use only in
-  Technology Adapter Agent when technology_context.profileId is python.
----
+  Map Core Design Model IR to Python/FastAPI internal artifacts. Load when technology_context.profile.skill is python-adapter.
 
 # Python / FastAPI Adapter
 
@@ -21,12 +19,12 @@ Read `technology_context.json` + `core_design_model.json`. Map generic layers us
 
 ## Outputs
 
-- `src/output_workflow/Application/Design.json` — stack-specific layered design
-- `src/output_workflow/Application/Design.md` — includes legacy migration pseudo-code in **Python** with traceability
-- `src/output_workflow/Application/openapi.yaml` — OpenAPI 3.1 from `apiOperations`
-- `src/output_workflow/Security/Security.json` — from IR.security
-- `src/output_workflow/Database/Database.json` — from IR.data
-- `src/output_workflow/Messaging/MessageDesign.json` — from IR.messaging (if non-empty)
+- `src/output_workflow/_internal/Application/Design.json` — stack-specific layered design
+- `src/output_workflow/_internal/Application/Design.md` — includes legacy migration pseudo-code in **Python** with traceability
+- `src/output_workflow/_internal/Application/openapi.yaml` — OpenAPI 3.1 from `apiOperations`
+- `src/output_workflow/_internal/Security/Security.json` — from IR.security
+- `src/output_workflow/_internal/Database/Database.json` — from IR.data
+- `src/output_workflow/_internal/Messaging/MessageDesign.json` — from IR.messaging (if non-empty)
 
 ## Legacy migration
 

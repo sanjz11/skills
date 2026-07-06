@@ -1,36 +1,42 @@
 ---
 name: design-generic-enricher
 description: >-
-  Enrich Core Design Model IR with cross-cutting concerns (security, data,
-  messaging). Technology-blind. Use for Security, Data, and Messaging Enricher agents.
+  Shared rules for enriching the Core Design Model IR with cross-cutting
+  concerns. Use alongside design-generic-security, design-generic-data, and
+  design-generic-messaging when patching the IR.
 ---
 
-# Generic Enricher Skill
+# Generic IR Enrichment (shared rules)
 
 ## Purpose
 
-Read `src/output_workflow/core_design_model.json`, enrich a **single cross-cutting section**, write IR back (bump `meta.v` patch).
+Patch `src/output_workflow/_internal/core_design_model.json` with technology-blind cross-cutting content. Each domain skill (security, data, messaging) owns its section; this skill defines **common rules**.
 
 ## Rules
 
-1. **Never** add technology-specific terms
+1. **Never** add technology-specific terms to the IR
 2. Only add sections supported by epic, ADR, domain model, and existing IR
-3. If epic has no messaging requirements, leave `messaging.events` empty — do not invent
-4. Preserve all existing IR fields verbatim
-5. Append changelog entry to `src/output_workflow/design_changelog.md`
+3. If requirements do not apply, leave the section empty — do not invent
+4. Preserve all existing IR fields verbatim unless patching a named change
+5. Bump `meta.v` patch on every IR update
+6. Document assumptions in `meta.assumptions[]` when information is incomplete
 
-## Security enricher adds
+## Workflow modes
 
-`security.authentication`, `security.authorization`, `security.roles`, `security.policies` — generic (RBAC, MFA requirement, token-based, etc.)
+**CREATE:** build from requirements inputs.
 
-## Data enricher adds
+**UPDATE:** read existing IR first; patch only what change requirements name; copy everything else verbatim; append `src/output_workflow/_internal/design_changelog.md`.
 
-`data.entities`, `data.relationships`, `data.persistence`, `data.migrations` — conceptual schema, not PostgreSQL DDL
+## Section ownership
 
-## Messaging enricher adds
-
-`messaging.events`, `messaging.commands`, `messaging.patterns`, `messaging.reliability` — generic pub/sub, delivery guarantees
+| Skill | IR sections |
+|-------|-------------|
+| design-generic-security | `security`, related policy notes |
+| design-generic-data | `data`, `dataEntities`, relationships |
+| design-generic-messaging | `messaging`, event/command links to `integrations` |
 
 ## Do not
 
-- Emit MessageDesign.json, Security.json, Database.json — Adapter maps from IR
+- Emit stack-specific artifact files (`Security.json`, `Database.json`, `MessageDesign.json`) — technology adapter maps from IR
+- Emit consolidated deliverables
+- Contradict ADR; ADR wins — document conflicts in `meta.assumptions`

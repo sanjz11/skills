@@ -1,9 +1,7 @@
 ---
 name: react-native-adapter
 description: >-
-  Map Core Design Model IR to React Native design artifacts. Use only in Technology
-  Adapter Agent when profile is react-native or category is mobile.
----
+  Map Core Design Model IR to React Native internal artifacts. Load when technology_context.profile.skill is react-native-adapter.
 
 # React Native Adapter
 
@@ -21,9 +19,9 @@ Map IR layers using `profile.layerMapping`. **Do not** emit Spring/Java artifact
 
 ## Outputs
 
-- `src/output_workflow/Presentation/PresentationDesign.json` — screens, navigation, components, state
-- `src/output_workflow/Presentation/PresentationDesign.md` + `_Diagrams.mmd`
-- `src/output_workflow/Application/Design.json` — **client layer only** (API client, DTOs, error mapping)
+- `src/output_workflow/_internal/Presentation/PresentationDesign.json` — screens, navigation, components, state
+- `src/output_workflow/_internal/Presentation/PresentationDesign.md` + `_Diagrams.mmd`
+- `src/output_workflow/_internal/Application/Design.json` — **client layer only** (API client, DTOs, error mapping)
 - Skip Security.json, Database.json, MessageDesign.json unless IR sections are non-empty and relevant to mobile
 
 ## Rules

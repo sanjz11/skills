@@ -1,34 +1,34 @@
 ---
 name: design-technology-base
 description: >-
-  Base technology-aware design patterns for the Design Workflow. Use when resolving
-  target stack, selecting enabled design domains, or generating stack-appropriate
-  pseudo-code and artifacts. Always read technology_context.json first.
+  Resolve target technology profile from registry and user inputs. Load when
+  writing technology_context.json. Defines stack resolution, enabled domains,
+  and workspace artifact layout — no design content.
 ---
 
 # Design Technology Base
 
 ## When to use
 
-- **Technology Context Builder** agent  — resolves stack, writes `technology_context.json`
-- Technology Adapter loads `profile.skill` / `profile.adapter` from registry
+Load when resolving the target stack and writing `technology_context.json`.
 
-## V6 architecture
+Read `config/technology-registry.json` and user stack inputs before writing output.
+
+## Architecture principle
 
 ```
-IR (generic) → Technology Adapter (stack-specific)
+Requirements → technology context → generic IR → stack adaptation → deliverables
 ```
 
-Generic agents never read adapter skills. Only Technology Adapter Agent loads `adapters/*-adapter` skills.
+Generic IR skills never load stack adapter skills. Only the stack adaptation step loads `*-adapter` skills from `technology_context.profile.skill`.
 
 ## Resolution procedure
 
 1. Read `config/technology-registry.json`.
 2. Match `target_technology_stack` against `profiles.*.aliases` (case-insensitive).
 3. If no match: use `architecture_type` category → `generic-backend` or category default.
-4. Set `enabled_domains` from `categories[category].defaultDomains`.
-5. Disable `database` for pure frontend/mobile when ADR says BFF-only; disable `presentation` for pure backend/integration.
-6. Write `src/output_workflow/technology_context.json`:
+4. Set `enabled_domains` from category and ADR (e.g. omit `database` for BFF-only frontend; omit `presentation` for pure backend/integration).
+5. Write `src/output_workflow/_internal/technology_context.json`:
 
 ```json
 {
@@ -36,28 +36,34 @@ Generic agents never read adapter skills. Only Technology Adapter Agent loads `a
   "profileId": "<matched profile id>",
   "displayName": "<profile displayName>",
   "category": "<backend|frontend|mobile|integration|cloud|fullstack|data>",
-  "enabled_domains": ["application", "..."],
+  "enabled_domains": ["application"],
   "profile": {
     "pseudoCodeLanguage": "...",
     "legacySourceLanguages": ["..."],
-    "skill": "...",
+    "skill": "<adapter-skill-name>",
+    "adapter": "<adapter-id>",
     "patterns": ["..."],
+    "layerMapping": {},
+    "artifacts": [],
     "contractFormats": ["openapi"]
   },
   "meta": { "ts": "<ISO8601>", "v": "1.0" }
 }
 ```
 
+Copy `layerMapping`, `artifacts`, `framework`, `namingConvention` from the matched registry profile.
+
 ## Pseudo-code rules
 
-- Never hardcode Java unless `profileId` is `java-spring`.
-- Use the profile's `pseudoCodeLanguage` for all business-logic migration blocks.
-- Legacy excerpts use languages from `legacySourceLanguages`; prefer the language in source docs.
+- Use `profile.pseudoCodeLanguage` from technology_context for business-logic migration — never assume a language.
+- Legacy excerpts use `legacySourceLanguages` from the profile or source documents.
 
-## Domain output paths
+## Workspace artifact layout
 
-| Domain | Directory | Primary JSON |
-|--------|-----------|--------------|
+Internal artifacts live under `src/output_workflow/_internal/`:
+
+| Domain | Directory (under `_internal/`) | Primary JSON |
+|--------|-------------------------------|--------------|
 | application | Application/ | Design.json |
 | messaging | Messaging/ | MessageDesign.json |
 | security | Security/ | Security.json |
@@ -66,14 +72,14 @@ Generic agents never read adapter skills. Only Technology Adapter Agent loads `a
 | integration | Integration/ | IntegrationDesign.json |
 | cloud | Cloud/ | CloudDesign.json |
 
-## Workflow graph routing 
+Shareable deliverables live at `src/output_workflow/` root only (consolidated files).
 
-V6 uses a **single linear pipeline** — no per-stack graph branching. The Technology Adapter decides which artifact folders to emit based on IR content and `technology_context.category`.
+## Category guidance
 
-- **backend/fullstack**: OpenAPI 3.1 primary
-- **integration**: RAML or OpenAPI + AsyncAPI for events
-- **frontend/mobile**: OpenAPI/GraphQL client contracts; component/state design in Presentation/
+- **backend / fullstack:** OpenAPI 3.1 primary for APIs
+- **integration:** RAML or OpenAPI + AsyncAPI for events when IR.messaging is non-empty
+- **frontend / mobile:** client contracts + presentation design under Presentation/
 
 ## Extending for new technologies
 
-Add one entry to `technology-registry.json` + one skill file. No workflow graph changes required.
+Add one entry to `technology-registry.json` + one adapter skill. No workflow graph changes required.

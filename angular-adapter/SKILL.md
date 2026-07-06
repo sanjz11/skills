@@ -1,9 +1,7 @@
 ---
 name: angular-adapter
 description: >-
-  Map Core Design Model IR to Angular design artifacts. Use only in Technology
-  Adapter Agent when technology_context.profileId is angular.
----
+  Map Core Design Model IR to Angular internal artifacts. Load when technology_context.profile.skill is angular-adapter.
 
 # Angular Adapter
 
@@ -21,9 +19,9 @@ Read `technology_context.json` + `core_design_model.json`. Map generic layers us
 
 ## Outputs
 
-- `src/output_workflow/Presentation/PresentationDesign.json` — modules, components, routes, services
-- `src/output_workflow/Presentation/PresentationDesign.md` + `_Diagrams.mmd`
-- `src/output_workflow/Application/Design.json` — client API contracts and DTO interfaces
+- `src/output_workflow/_internal/Presentation/PresentationDesign.json` — modules, components, routes, services
+- `src/output_workflow/_internal/Presentation/PresentationDesign.md` + `_Diagrams.mmd`
+- `src/output_workflow/_internal/Application/Design.json` — client API contracts and DTO interfaces
 - Skip Security.json, Database.json, MessageDesign.json unless IR sections are non-empty and relevant to the web client
 
 ## Legacy migration
