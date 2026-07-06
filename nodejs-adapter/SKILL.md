@@ -87,7 +87,7 @@ Registry profile `nodejs` lists:
 - `references/nestjs-module-pattern.md`
 - `references/Design-json-shape.json`
 
-Load each reference file from this adapter skill folder. **Render IR into reference JSON/Markdown shapes** — tune stack output by editing references in GitHub, not workflow prompts.
+Load each reference file from this adapter skill folder. **Render IR into reference JSON/Markdown shapes** — tune stack output by editing references in the skills repository, not orchestration prompts.
 
 ## Best practices (Node.js / NestJS)
 
@@ -100,7 +100,7 @@ Load each reference file from this adapter skill folder. **Render IR into refere
 |--------|-----------|-------------|
 | Output file shape | `references/*-shape.json` | IR schema |
 | Layer mapping labels | `technology-registry.json` → layerMapping | generic skills |
-| Stack conventions | This SKILL.md + references | workflow user prompt |
+| Stack conventions | This SKILL.md + references | step orchestration prompts |
 | ADR defaults | registry `adrDefaults` | adr-blueprint keys list |
 
 Future phases: `implementationSkill` + `testingSkill` in registry (see `config/agent-contracts.json`).

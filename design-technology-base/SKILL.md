@@ -82,6 +82,25 @@ Requirements → technology context → generic IR → stack adaptation → deli
 
 Generic IR skills never load `*-adapter` skills. Only stack adaptation loads `technology_context.profile.skill`.
 
+## Category guidance (artifact emphasis)
+
+| Category | Primary contracts | Typical internal folders |
+|----------|-------------------|---------------------------|
+| backend / fullstack | OpenAPI 3.1 | Application/, Security/, Database/, Messaging/ |
+| integration | RAML or OpenAPI + AsyncAPI when IR.messaging is non-empty | Integration/, Messaging/ |
+| frontend / mobile | OpenAPI or GraphQL client contracts | Presentation/, Application/ (client only) |
+| cloud / data | OpenAPI or infrastructure contracts per profile | Cloud/ or data platform folders |
+
+Stack adaptation chooses which folders to emit from IR content and `enabled_domains` — not from pipeline branching.
+
+## Extending the registry
+
+1. Add a profile block to `config/technology-registry.json` (`aliases`, `layerMapping`, `adrDefaults`, `references`, `bestPractices`).
+2. Add an adapter skill folder with `SKILL.md` and `references/`.
+3. Point `profile.skill` and `profile.references` at the new adapter.
+
+Orchestration steps stay the same; quality tuning is **registry + skills + references** only.
+
 ## Completion gate
 
 Valid JSON on disk, profile resolvable, assumptions documented for any fuzzy match.
