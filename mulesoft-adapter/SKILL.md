@@ -16,7 +16,7 @@ Transform `core_design_model.json` into **complete MuleSoft Anypoint design arti
 
 If `references/*` files are not visible next to `SKILL.md`, fetch from:
 
-`https://pscode.lioncloud.net/rohranja3/coe-skills/-/raw/main/mulesoft-adapter/references/<filename>`
+`https://raw.githubusercontent.com/sanjz11/skills/main/mulesoft-adapter/references/<filename>`
 
 Use `command_line` (`curl -fsSL`) before proceeding without templates.
 

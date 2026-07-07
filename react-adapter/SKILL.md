@@ -17,7 +17,7 @@ Transform `core_design_model.json` into **complete internal React (Web) design a
 
 If `references/*` files are not visible next to `SKILL.md`, fetch from:
 
-`https://pscode.lioncloud.net/rohranja3/coe-skills/-/raw/main/react-adapter/references/<filename>`
+`https://raw.githubusercontent.com/sanjz11/skills/main/react-adapter/references/<filename>`
 
 Use `command_line` (`curl -fsSL`) before proceeding without templates.
 

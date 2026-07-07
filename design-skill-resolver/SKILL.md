@@ -33,7 +33,7 @@ technology_context.executionContext.loadedSkillPack  →  ONE adapter skill
    - `profile.skill` matches `loadedSkillPack`
 3. **Load only** `executionContext.loadedSkillPack` via the `skills` tool.
 4. If skill package files not visible, curl from:
-   `https://pscode.lioncloud.net/rohranja3/coe-skills/-/raw/main/<loadedSkillPack>/`
+   `https://raw.githubusercontent.com/sanjz11/skills/main/<loadedSkillPack>/`
 5. Load each file in `profile.references` from that pack only.
 6. Execute adaptation per loaded pack SKILL.md, `designCapabilities[]`, and **`profile.designContracts[]`**.
 7. **Design contracts (mandatory):** for each contract where `mandatory: true` (or `when` condition met), generate file at `path` from IR `source`:

@@ -17,7 +17,7 @@ Transform `core_design_model.json` into **complete internal Java / Spring Boot d
 
 If `references/*` files are not visible next to `SKILL.md`, fetch from:
 
-`https://pscode.lioncloud.net/rohranja3/coe-skills/-/raw/main/java-adapter/references/<filename>`
+`https://raw.githubusercontent.com/sanjz11/skills/main/java-adapter/references/<filename>`
 
 Use `command_line` (`curl -fsSL`) before proceeding without templates.
 

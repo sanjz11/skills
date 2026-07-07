@@ -45,7 +45,7 @@ Use bootstrapped copy at `_internal/_config/adr-blueprint.json` — not `config/
 
 If `adr-blueprint.json` is not visible next to `SKILL.md`:
 
-`curl -fsSL https://pscode.lioncloud.net/rohranja3/coe-skills/-/raw/main/design-requirements-base/adr-blueprint.json`
+`curl -fsSL https://raw.githubusercontent.com/sanjz11/skills/main/design-requirements-base/adr-blueprint.json`
 
 Write result to `_internal/_config/adr-blueprint.json` before synthesizing requirements.
 

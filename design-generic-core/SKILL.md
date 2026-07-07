@@ -78,7 +78,7 @@ Full DDD per context: aggregates, entities, valueObjects, domainEvents. Map ever
 ## Bootstrap
 
 Read bundled `core-design-model-schema.json`; write to `_config/`. Curl fallback:
-`https://pscode.lioncloud.net/rohranja3/coe-skills/-/raw/main/design-generic-core/core-design-model-schema.json`
+`https://raw.githubusercontent.com/sanjz11/skills/main/design-generic-core/core-design-model-schema.json`
 
 ## Rules (mandatory)
 

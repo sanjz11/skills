@@ -25,7 +25,7 @@ description: >-
 
 1. Load this skill via the `skills` tool.
 2. Read bundled JSON; write to `src/output_workflow/_internal/_config/`.
-3. If bundled files not visible, curl from `https://pscode.lioncloud.net/rohranja3/coe-skills/-/raw/main/design-technology-base/`.
+3. If bundled files not visible, curl from `https://raw.githubusercontent.com/sanjz11/skills/main/design-technology-base/`.
 
 ## Archetype classification (mandatory — before profile match)
 
