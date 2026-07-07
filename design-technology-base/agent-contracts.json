@@ -1,14 +1,26 @@
 {
-  "version": "2.1",
+  "version": "2.2",
+  "outputRoot": {
+    "placeholder": "<OUTPUT_ROOT>",
+    "default": "src/output_workflow",
+    "internal": "<OUTPUT_ROOT>/_internal",
+    "config": "<OUTPUT_ROOT>/_internal/_config",
+    "resolution": [
+      "If technology_context.json exists under any */_internal/, OUTPUT_ROOT is that _internal parent",
+      "Else if src/output_workflow/ exists, use src/output_workflow",
+      "Else create and use src/output_workflow"
+    ]
+  },
   "strategy": "Archetype-first design: classify engineering domain → resolve one technology profile → build archetype-aware IR → load exactly one design skill pack via resolver. Adapter emits stack-specific designContracts (OpenAPI, RAML, AsyncAPI).",
   "agents": {
     "archetype-technology-resolver": {
       "label": "Archetype & Technology Resolver",
       "primaryGoal": "Classify application archetype, resolve technology profile, emit executionContext with single loadedSkillPack.",
       "skills": ["design-technology-base", "design-requirements-base"],
-      "mustRead": ["_config/technology-registry.json", "_config/adr-blueprint.json"],
-      "outputs": ["src/output_workflow/_internal/technology_context.json", "src/output_workflow/_internal/inputs_manifest.json"],
+      "mustRead": ["<OUTPUT_ROOT>/_internal/_config/technology-registry.json", "<OUTPUT_ROOT>/_internal/_config/adr-blueprint.json"],
+      "outputs": ["<OUTPUT_ROOT>/_internal/technology_context.json", "<OUTPUT_ROOT>/_internal/inputs_manifest.json"],
       "bestPractices": [
+        "Resolve OUTPUT_ROOT once per step before any writes",
         "Classify every upload by content before archetype resolution",
         "Copy profile.designContracts into technology_context.profile",
         "Write executionContext.loadedSkillPack = profile.skill (exactly one adapter)"
@@ -26,14 +38,14 @@
         "design-generic-enricher"
       ],
       "mustRead": [
-        "_config/core-design-model-schema.json",
-        "src/output_workflow/_internal/inputs_manifest.json",
-        "src/output_workflow/_internal/technology_context.json"
+        "<OUTPUT_ROOT>/_internal/_config/core-design-model-schema.json",
+        "<OUTPUT_ROOT>/_internal/inputs_manifest.json",
+        "<OUTPUT_ROOT>/_internal/technology_context.json"
       ],
       "outputs": [
-        "src/output_workflow/_internal/requirements_context.json",
-        "src/output_workflow/_internal/core_design_model.json",
-        "src/output_workflow/_internal/core_design_model.md"
+        "<OUTPUT_ROOT>/_internal/requirements_context.json",
+        "<OUTPUT_ROOT>/_internal/core_design_model.json",
+        "<OUTPUT_ROOT>/_internal/core_design_model.md"
       ],
       "bestPractices": [
         "apiOperations[] must be complete enough for downstream OpenAPI/RAML generation",
@@ -45,11 +57,11 @@
       "primaryGoal": "Load one skill pack; map IR to stack artifacts including mandatory designContracts.",
       "skills": ["design-skill-resolver"],
       "mustRead": [
-        "src/output_workflow/_internal/core_design_model.json",
-        "src/output_workflow/_internal/technology_context.json",
-        "_config/technology-registry.json"
+        "<OUTPUT_ROOT>/_internal/core_design_model.json",
+        "<OUTPUT_ROOT>/_internal/technology_context.json",
+        "<OUTPUT_ROOT>/_internal/_config/technology-registry.json"
       ],
-      "outputs": ["src/output_workflow/_internal/**"],
+      "outputs": ["<OUTPUT_ROOT>/_internal/**"],
       "expectedArtifactsByProfile": {
         "java-spring": ["Domain/DomainDesign.json", "Application/Design.json", "Application/openapi.yaml"],
         "nodejs": ["Application/Design.json", "Application/openapi.yaml"],
@@ -89,10 +101,10 @@
       "label": "Design Deliverable",
       "primaryGoal": "Two stakeholder files; include design contract summary and paths.",
       "skills": ["design-deliverable"],
-      "mustRead": ["src/output_workflow/_internal/"],
+      "mustRead": ["<OUTPUT_ROOT>/_internal/"],
       "outputs": [
-        "src/output_workflow/consolidated_design.md",
-        "src/output_workflow/consolidated_design.json"
+        "<OUTPUT_ROOT>/consolidated_design.md",
+        "<OUTPUT_ROOT>/consolidated_design.json"
       ],
       "bestPractices": [
         "Include designContracts section with format, path, operation count",
@@ -104,9 +116,9 @@
       "primaryGoal": "JSON quality gate; CRITICAL on missing mandatory design contracts.",
       "skills": ["design-deliverable"],
       "mustRead": [
-        "src/output_workflow/consolidated_design.md",
-        "src/output_workflow/_internal/core_design_model.json",
-        "src/output_workflow/_internal/technology_context.json"
+        "<OUTPUT_ROOT>/consolidated_design.md",
+        "<OUTPUT_ROOT>/_internal/core_design_model.json",
+        "<OUTPUT_ROOT>/_internal/technology_context.json"
       ],
       "criticalChecks": [
         "technology_context.profile.designContracts present",
