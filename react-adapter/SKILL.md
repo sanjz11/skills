@@ -1,114 +1,83 @@
 ---
 name: react-adapter
 description: >-
-  Map IR to React (Web) internal artifacts. Primary goal: always produce
-  stack-specific files from IR + technology_context. Proceed with assumptions
-  when IR sections are empty. Load when technology_context.profile.skill is react-adapter.
+  Map IR to React (Web) internal artifacts including routes, hooks, and
+  presentation style tokens. Primary goal: always produce stack-specific files
+  from IR + technology_context. Load when technology_context.profile.skill is
+  react-adapter.
 ---
 
 # React (Web) Adapter
 
 ## Primary goal
 
-Transform `core_design_model.json` into **complete internal React (Web) design artifacts** under `_internal/` — using `technology_context.profile.skill`, `layerMapping`, and `artifacts` — **even when IR sections are partial or epic uploads were missing**.
+Transform `core_design_model.json` into **complete internal React (Web) design artifacts** — pages, routes, hooks, API clients, **and visual style/CSS token design** — under `_internal/`.
+
+## Bootstrap fallback (references)
+
+If `references/*` files are not visible next to `SKILL.md`, fetch from:
+
+`https://raw.githubusercontent.com/sanjz11/skills/main/react-adapter/references/<filename>`
+
+Use `command_line` (`curl -fsSL`) before proceeding without templates.
 
 ## Success criteria
 
-- [ ] Read `src/output_workflow/_internal/core_design_model.json` and `src/output_workflow/_internal/technology_context.json` first
-- [ ] Loaded skill matches `technology_context.profile.skill` (react-adapter)
-- [ ] Required profile artifacts written under `src/output_workflow/_internal/`
-- [ ] `legacyLogicMigration` rendered as **TypeScript/JSX** pseudo-code in `.md` files with `// Legacy line N:` traceability
-- [ ] Each JSON artifact includes `meta.techProfile`, `meta.irVersion`, `meta.adapter`
-- [ ] Empty IR sections: skip file OR write minimal stub with `meta.assumptions` — never fail silently
-- [ ] No consolidated deliverables at workflow root
+- [ ] Read IR and `technology_context.json` first; abort if `technology_context.error` — re-bootstrap registry first
+- [ ] `Presentation/PresentationDesign.json` — routes, pages, components, flow families
+- [ ] **`Presentation/PresentationStyle.json`** — design tokens, component styles, per-view layout/CSS guidance
+- [ ] **`Presentation/PresentationStyle.md`** — human-readable style guide with CSS variable table
+- [ ] `Application/Design.json` — hooks, contexts, stores, API clients, interceptors
+- [ ] `legacyLogicMigration` as **TypeScript/JSX** pseudo-code in `.md` files
+- [ ] Each JSON includes `meta.techProfile`, `meta.irVersion`, `meta.adapter`
 
-## Inputs
-
-- `src/output_workflow/_internal/core_design_model.json`
-- `src/output_workflow/_internal/technology_context.json`
-- `src/output_workflow/_internal/_config/technology-registry.json`
-
-## Layer → artifact mapping
-
-| IR layer | React (Web) artifacts |
-|----------|---------------------------|
-| presentation | Page, Component, Route, layout |
-| business | Custom hook, Context provider |
-| data | API client, store slice |
-| integration | API layer / BFF client |
-| configuration | env config, build config |
-
-## Outputs
+## Outputs (all required for frontend profile)
 
 - `src/output_workflow/_internal/Presentation/PresentationDesign.json`
 - `src/output_workflow/_internal/Presentation/PresentationDesign.md`
+- `src/output_workflow/_internal/Presentation/PresentationStyle.json`
+- `src/output_workflow/_internal/Presentation/PresentationStyle.md`
 - `src/output_workflow/_internal/Application/Design.json`
 
-## Procedure
+## Presentation style procedure (mandatory)
 
-1. Read IR and technology context.
-2. Load this skill via skills tool.
-3. Map each non-empty IR layer per `layerMapping`.
-4. Generate openapi/contracts from `apiOperations` when profile includes them.
-5. Map `security`, `data`, `messaging` IR sections to folder JSONs when non-empty and category-relevant.
-6. Write all artifacts; bump `meta.v` on updates.
+1. Load `references/presentation-style-pattern.md` and `PresentationStyle-json-shape.json`.
+2. Build token catalog: colors, typography, spacing, radius, elevation.
+3. For each view/page: document layout pattern and state visuals (loading, empty, error, success).
+4. Bind shared components to CSS variables / token refs.
+5. Document `cssStrategy` (default: CSS variables + CSS Modules when epic silent).
+6. Support RTL token variant when epic/ADR mentions bidirectional layout.
 
-## Handling missing or incomplete inputs
+## Layer mapping
 
-You must still produce adapter artifacts. IR is the source of truth.
+| IR layer | React artifacts |
+|----------|-----------------|
+| presentation | Page, Component, Route, layout |
+| business | Custom hook, Context provider |
+| data | API client, store slice, query cache |
+| integration | API layer / auth refresh client |
+| configuration | env config, design tokens |
 
-| Situation | What to do |
-|-----------|------------|
-| IR section empty | Skip that artifact file OR emit minimal stub documenting omission in artifact `meta.assumptions` |
-| apiOperations incomplete | Complete from capabilities using RESTful conventions; flag `[REVIEW]` in meta |
-| No legacyLogicMigration | Omit pseudo-code blocks — do not invent legacy |
-| technology_context partial | Re-read registry; never guess a different profile |
-| Epic never uploaded | Rely entirely on IR + technology_context |
-
-Stack-specific: Derive pages from apiOperations + capabilities if epic lacks UI detail.
-
-Use `clarify` only if `technology_context.profileId` conflicts with registry or IR stack hints.
-
-## Legacy migration
-
-For each `legacyLogicMigration[]` entry: **TypeScript/JSX** pseudo-code in Design/Presentation `.md` with traceability comments.
-
-## Naming
-
-camelCase members; PascalCase components.
-
-## Reference patterns (load via skills tool)
-
-Registry profile `react` lists:
+## Reference patterns
 
 - `references/page-component-pattern.md`
+- `references/presentation-style-pattern.md`
 - `references/PresentationDesign-json-shape.json`
+- `references/PresentationStyle-json-shape.json`
 
-Load each reference file from this adapter skill folder. **Render IR into reference JSON/Markdown shapes** — tune stack output by editing references in the skills repository, not orchestration prompts.
+## Best practices
 
-## Best practices (React (Web))
-
-- Pages from routes in IR
-- Hooks for business logic
-
-## Tuning strategy
-
-| Change | Edit here | Do not edit |
-|--------|-----------|-------------|
-| Output file shape | `references/*-shape.json` | IR schema |
-| Layer mapping labels | `technology-registry.json` → layerMapping | generic skills |
-| Stack conventions | This SKILL.md + references | step orchestration prompts |
-| ADR defaults | registry `adrDefaults` | adr-blueprint keys list |
-
-Future phases: `implementationSkill` + `testingSkill` in bootstrapped registry (see `agent-contracts.json` in design-technology-base skill).
+- Pages from routes in IR; one page component per connected view
+- Hooks for business logic; no API calls directly in presentational components
+- Loading-empty-error-success quartet on every data-bearing view
+- Style tokens centralized — no hardcoded hex in component specs
 
 ## Do not
 
-- Write `consolidated_design.md` or `consolidated_design.json`
-- Load a different adapter skill than `profile.skill`
-- Invent APIs or rules absent from IR (infer only with `meta.assumptions`)
-- Use a stack that does not match `technology_context.profileId` (react)
+- Skip style artifacts — visual design is part of frontend adaptation
+- Write consolidated deliverables
+- Use react-native patterns unless `profileId` is `react-native`
 
 ## Completion gate
 
-All applicable outputs exist under `_internal/`; assumptions recorded for every inferred design element.
+Presentation (design + style) and Application artifacts exist; style covers all routes in PresentationDesign.

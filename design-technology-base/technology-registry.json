@@ -104,6 +104,8 @@
         ]
       },
       "artifacts": [
+        "DomainDesign.json",
+        "DomainDesign.md",
         "Design.json",
         "Design.md",
         "openapi.yaml"
@@ -125,6 +127,7 @@
         "testing_strategy": "unit-integration-contract-junit"
       },
       "references": [
+        "references/ddd-pattern.md",
         "references/controller-pattern.md",
         "references/repository-pattern.md",
         "references/Design-json-shape.json"
@@ -134,7 +137,10 @@
       "bestPractices": [
         "Constructor injection only; avoid field injection",
         "OpenAPI 3.1 generated from IR apiOperations",
-        "Transactional boundaries on service layer not controllers"
+        "Transactional boundaries on application service layer not controllers",
+        "Map every IR boundedContext to Domain/DomainDesign with aggregates and aggregate roots",
+        "Map every businessRule id to a domain or application enforcement point",
+        "One repository per aggregate root; reference other aggregates by ID only"
       ]
     },
     "react-native": {
@@ -269,13 +275,18 @@
       },
       "references": [
         "references/api-led-pattern.md",
+        "references/connector-error-handler-pattern.md",
         "references/IntegrationDesign-json-shape.json"
       ],
       "implementationSkill": "mulesoft-implementation",
       "testingSkill": "mulesoft-testing",
       "bestPractices": [
-        "Experience / Process / System API separation",
-        "DataWeave for transforms; error handlers on all flows"
+        "Experience / Process / System API separation on every solution",
+        "DataWeave 2.0 for all transforms; error handler on every flow and subflow",
+        "Map IR errors[] to on-error-propagate vs on-error-continue with selective retry",
+        "Connectors named and configured from IR integrations with externalized properties",
+        "Correlation ID propagation across async commands and sync health probes",
+        "MUnit coverage for each main process flow including retry and failure paths"
       ]
     },
     "react": {
@@ -319,7 +330,9 @@
       },
       "artifacts": [
         "PresentationDesign.json",
-        "PresentationDesign.md"
+        "PresentationDesign.md",
+        "PresentationStyle.json",
+        "PresentationStyle.md"
       ],
       "testing": [
         "Jest",
@@ -335,13 +348,18 @@
       },
       "references": [
         "references/page-component-pattern.md",
-        "references/PresentationDesign-json-shape.json"
+        "references/presentation-style-pattern.md",
+        "references/PresentationDesign-json-shape.json",
+        "references/PresentationStyle-json-shape.json"
       ],
       "implementationSkill": "react-implementation",
       "testingSkill": "react-testing",
       "bestPractices": [
         "Pages from routes in IR",
-        "Hooks for business logic"
+        "Hooks for business logic",
+        "PresentationStyle.json with design tokens and per-view CSS guidance on every run",
+        "Loading-empty-error-success states styled via shared token catalog",
+        "Centralize colors/spacing/typography as CSS variables — no hardcoded values in component specs"
       ]
     },
     "angular": {

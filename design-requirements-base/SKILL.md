@@ -25,6 +25,14 @@ Always produce `src/output_workflow/_internal/requirements_context.json` with a 
 
 Use bootstrapped copy at `_internal/_config/adr-blueprint.json` — not `config/`.
 
+### Bootstrap fallback
+
+If `adr-blueprint.json` is not visible next to `SKILL.md`:
+
+`curl -fsSL https://raw.githubusercontent.com/sanjz11/skills/main/design-requirements-base/adr-blueprint.json`
+
+Write result to `_internal/_config/adr-blueprint.json` before synthesizing requirements.
+
 ## Success criteria
 
 - [ ] `_internal/_config/adr-blueprint.json` bootstrapped from this skill

@@ -5,12 +5,36 @@
     "adapter": "java-adapter",
     "assumptions": []
   },
+  "domainModel": {
+    "boundedContexts": [
+      {
+        "id": "",
+        "name": "",
+        "package": "",
+        "description": "",
+        "aggregates": [
+          {
+            "name": "",
+            "rootEntity": "",
+            "entities": [],
+            "valueObjects": [],
+            "invariants": [],
+            "domainEvents": [],
+            "businessRuleIds": [],
+            "repository": ""
+          }
+        ],
+        "domainServices": [],
+        "applicationServices": []
+      }
+    ]
+  },
   "layers": {
-    "presentation": { "controllers": [], "dtos": [] },
-    "business": { "services": [], "domainRules": [] },
-    "data": { "repositories": [], "entities": [] },
-    "integration": { "clients": [], "listeners": [] },
-    "configuration": { "properties": [], "beans": [] }
+    "presentation": { "controllers": [], "dtos": [], "validators": [] },
+    "business": { "services": [], "domainRules": [], "transactionBoundaries": [] },
+    "data": { "repositories": [], "entities": [], "mappers": [], "readModels": [] },
+    "integration": { "clients": [], "listeners": [], "eventPublishers": [] },
+    "configuration": { "properties": [], "beans": [], "featureFlags": [] }
   },
   "apiOperations": [],
   "legacyMigration": [],

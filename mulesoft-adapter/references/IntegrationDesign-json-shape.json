@@ -1,6 +1,60 @@
 {
-  "meta": {},
-  "experienceApi": {},
-  "processFlows": [],
-  "systemApis": []
+  "meta": {
+    "techProfile": "mulesoft",
+    "irVersion": "",
+    "adapter": "mulesoft-adapter",
+    "assumptions": []
+  },
+  "apiLedLayers": {
+    "experienceApi": {
+      "name": "",
+      "ramlRef": "integration-apis.raml",
+      "resources": [],
+      "policies": []
+    },
+    "processApi": {
+      "name": "",
+      "mainFlows": [],
+      "subflows": []
+    },
+    "systemApi": {
+      "name": "",
+      "resources": []
+    }
+  },
+  "connectors": [
+    {
+      "name": "",
+      "type": "",
+      "irIntegrationRef": "",
+      "configProperties": [],
+      "operations": []
+    }
+  ],
+  "processFlows": [
+    {
+      "id": "",
+      "name": "",
+      "trigger": "",
+      "irWorkflowRef": "",
+      "steps": [],
+      "dataWeaveTransforms": [],
+      "errorHandler": {
+        "onErrorPropagate": [],
+        "onErrorContinue": [],
+        "retryPolicy": {}
+      }
+    }
+  ],
+  "messaging": {
+    "commands": [],
+    "events": [],
+    "destinations": []
+  },
+  "errorCatalog": [],
+  "munitTests": [],
+  "configuration": {
+    "properties": [],
+    "environments": []
+  }
 }

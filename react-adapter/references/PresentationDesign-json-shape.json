@@ -4,5 +4,6 @@
   "navigation": { "stacks": [], "routes": [] },
   "components": [],
   "stateModel": {},
-  "apiClient": { "methods": [] }
+  "apiClient": { "methods": [] },
+  "styleRef": "PresentationStyle.json"
 }

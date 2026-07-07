@@ -10,54 +10,51 @@ description: >-
 
 ## Primary goal
 
-Always produce **exactly two** shareable files at `src/output_workflow/` root — `consolidated_design.md` and `consolidated_design.json` — self-contained and consistent, built from whatever exists in `_internal/`, without requiring stakeholders to open subfolders.
+Always produce **exactly two** shareable files at `src/output_workflow/` root — `consolidated_design.md` and `consolidated_design.json` — self-contained and consistent, built from whatever exists in `_internal/`.
 
 ## Success criteria
 
 - [ ] `consolidated_design.md` exists — complete human-readable design
 - [ ] `consolidated_design.json` exists — valid JSON aligned with `.md`
+- [ ] `meta.adapterStatus`: `complete` | `partial` | `missing` (honest assessment)
 - [ ] No third shareable file at workflow root
-- [ ] Stack, APIs, business rules, legacy migration (if in IR) appear in `.md`
-- [ ] Sections missing from internal artifacts are either omitted with note in `meta.assumptions` or filled from IR with `[REVIEW]` flag
-- [ ] `.md` and `.json` do not contradict IR (IR wins on conflict)
+- [ ] Stack-specific sections inlined when adapter artifacts exist
 
-## Mandatory outputs
+## Mandatory sections in consolidated_design.md
 
-### 1. `consolidated_design.md`
+1. Executive summary
+2. Technology stack (from `technology_context`)
+3. Requirements and scope
+4. **Domain model (DDD)** — bounded contexts, aggregates, entities, value objects (from IR + `Domain/DomainDesign` when Java)
+5. Business rules (full)
+6. Legacy migration (full pseudo-code from adapter `.md` files)
+7. Architecture + Mermaid diagrams
+8. APIs / contracts
+9. Security, data, messaging (when in IR or adapter artifacts)
+10. **Presentation style** (frontend) — design tokens, layout, component styles from `PresentationStyle.*`
+11. **Integration design** (MuleSoft) — API-led layers, flows, connectors, error handlers from `Integration/*`
+12. NFR and deployment
 
-Executive summary, technology stack, requirements, business rules, legacy migration (full pseudo-code from adapter), architecture, APIs, security/data/messaging (if in IR), NFR, Mermaid diagrams.
+## consolidated_design.json shape
 
-### 2. `consolidated_design.json`
+Include: `technology`, `coreModelSummary`, `adaptedDesign`, `domainModel`, `apiSummary`, `meta`.
 
-`technology`, `coreModelSummary`, `adaptedDesign`, `apiSummary`, `meta`.
+Set `meta.adapterStatus` and list `meta.missingArtifacts[]` when adapter step did not produce expected files.
 
-## Procedure
-
-1. Read all of `src/output_workflow/_internal/`.
-2. Merge IR + adapted artifacts; IR is semantic source of truth.
-3. Fold internal folder content into the two files.
-4. UPDATE: patch only sections named in change requirements.
-
-## Handling missing or incomplete inputs
-
-You must still ship both deliverables.
+## Handling missing adapter artifacts
 
 | Situation | What to do |
 |-----------|------------|
-| Adapter artifacts missing | Consolidate from IR + `technology_context` only; note gap in `meta.assumptions` |
-| IR section empty | Omit section or include "Not in scope per assumptions" with reference to `meta.assumptions` |
-| OpenAPI missing | Build API summary from IR `apiOperations` |
-| Legacy pseudo-code missing | Include IR excerpts + note adapter gap; flag `[REVIEW]` |
-| Partial internal tree | Include what exists; never reference paths stakeholders cannot access |
-
-Use `clarify` only if deliverable purpose (audience, compliance packaging) is unknown and would change document structure materially.
+| Adapter artifacts missing | Set `adapterStatus: missing`; consolidate from IR; flag `[ADAPTER GAP]` prominently |
+| Domain/DomainDesign missing (Java) | Include IR `boundedContexts` in deliverable; flag gap |
+| PresentationStyle missing (React) | Include minimal token table from epic; flag gap |
+| IntegrationDesign missing (MuleSoft) | Do not claim MuleSoft-specific design; flag gap |
 
 ## Do not
 
-- Create more than 2 shareable root files
-- Omit legacy detail that exists in internal `.md` files
+- Hide adapter failures — validation downstream depends on honest `adapterStatus`
 - Say "see `_internal/` folder" — inline essential content
 
 ## Completion gate
 
-Two root files exist, cross-validated, assumptions documented for any synthesized content.
+Two root files exist; `adapterStatus` accurate; DDD and stack-specific sections present when artifacts exist.

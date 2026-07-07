@@ -32,6 +32,18 @@ Reunity has **no config workspace**. Config lives in skills on GitHub.
 
 All later steps read from `src/output_workflow/_internal/_config/` — never from `config/`.
 
+### Bootstrap fallback (when bundled JSON not visible)
+
+Reunity may expose only `SKILL.md` to `read_file`. If sibling files are missing from the skill package snapshot:
+
+1. Fetch with `command_line`:
+   - `curl -fsSL https://raw.githubusercontent.com/sanjz11/skills/main/design-technology-base/technology-registry.json`
+   - `curl -fsSL https://raw.githubusercontent.com/sanjz11/skills/main/design-technology-base/agent-contracts.json`
+2. Write fetched content to `_internal/_config/` paths above.
+3. **Never** write error-only `technology_context.json` until both fetches fail.
+
+If fetch fails, retry once; then write `technology_context.json` with `error` **and** `meta.bootstrapAttempted: true` documenting URLs tried.
+
 If `_config/` files already exist (UPDATE run), refresh only when registry skill version changed or change_requirements says so.
 
 ## Success criteria

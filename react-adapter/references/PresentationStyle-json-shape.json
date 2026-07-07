@@ -1,0 +1,112 @@
+{
+  "meta": {
+    "techProfile": "<from technology_context.profileId>",
+    "irVersion": "<from core_design_model.meta.v>",
+    "adapter": "react-adapter",
+    "assumptions": []
+  },
+  "designSystem": {
+    "name": "",
+    "mode": "light",
+    "rtlReady": false
+  },
+  "tokens": {
+    "color": {
+      "primary": "",
+      "secondary": "",
+      "background": "",
+      "surface": "",
+      "textPrimary": "",
+      "textSecondary": "",
+      "error": "",
+      "success": "",
+      "warning": "",
+      "border": ""
+    },
+    "typography": {
+      "fontFamily": "",
+      "fontFamilyRtl": "",
+      "scale": {
+        "caption": "",
+        "body": "",
+        "subtitle": "",
+        "title": "",
+        "headline": ""
+      },
+      "fontWeight": {
+        "regular": 400,
+        "medium": 500,
+        "bold": 700
+      },
+      "lineHeight": {}
+    },
+    "spacing": {
+      "unit": 4,
+      "scale": {
+        "xs": 4,
+        "sm": 8,
+        "md": 16,
+        "lg": 24,
+        "xl": 32
+      }
+    },
+    "radius": {
+      "sm": "",
+      "md": "",
+      "lg": "",
+      "pill": ""
+    },
+    "elevation": {
+      "card": "",
+      "modal": "",
+      "fab": ""
+    }
+  },
+  "layout": {
+    "breakpoints": {
+      "mobile": "0px",
+      "tablet": "768px",
+      "desktop": "1024px"
+    },
+    "grid": {
+      "columns": 12,
+      "gutter": "",
+      "maxContentWidth": ""
+    },
+    "pageShell": {
+      "headerHeight": "",
+      "footerHeight": "",
+      "safeAreaInsets": true
+    }
+  },
+  "componentStyles": [
+    {
+      "componentRef": "",
+      "states": ["default", "hover", "focus", "disabled", "loading", "error", "success"],
+      "cssVariables": {},
+      "classNames": {},
+      "notes": ""
+    }
+  ],
+  "viewStyles": [
+    {
+      "viewId": "",
+      "pageRef": "",
+      "layoutPattern": "stack | grid | carousel | modal-overlay",
+      "spacingRules": [],
+      "typographyRules": [],
+      "colorUsage": [],
+      "responsiveRules": []
+    }
+  ],
+  "accessibility": {
+    "contrastTarget": "WCAG AA",
+    "focusRing": "",
+    "touchTargetMinPx": 44
+  },
+  "cssStrategy": {
+    "approach": "css-modules | styled-components | tailwind-tokens",
+    "globalVariablesFile": "src/styles/tokens.css",
+    "themeProvider": "optional context wrapper name"
+  }
+}

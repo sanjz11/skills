@@ -1,23 +1,23 @@
 {
-  "version": "1.0",
+  "version": "1.1",
   "strategy": "Personas hold goals and guardrails. Workflow prompts orchestrate only. Skills hold domain depth. Registry + adr-blueprint hold defaults. Adapter references hold stack patterns. Tune skills/references per stack — never IR schema or generic skills.",
   "agents": {
     "technology-context": {
       "label": "Technology Context Builder",
-      "primaryGoal": "Resolve profile and write technology_context.json; never block on missing ADR.",
+      "primaryGoal": "Bootstrap config and write valid technology_context.json; never block on missing ADR.",
       "skills": ["design-technology-base", "design-requirements-base"],
-      "mustRead": ["config/technology-registry.json", "config/adr-blueprint.json"],
+      "mustRead": ["_config/technology-registry.json", "_config/adr-blueprint.json"],
       "outputs": ["src/output_workflow/_internal/technology_context.json"],
       "bestPractices": [
+        "Try skill-package read first; curl raw GitHub URLs if bundled JSON not visible",
+        "Never write error-only technology_context without attempting curl fallback",
         "Fuzzy-match stack aliases before falling back to category default",
-        "Copy layerMapping and references from registry profile verbatim",
-        "If ADR missing, still write context — ADR synthesis is requirements step",
-        "Record fuzzy matches in meta.assumptions"
+        "Copy layerMapping, artifacts, references from registry profile verbatim"
       ]
     },
     "core-ir": {
       "label": "Core Design Model",
-      "primaryGoal": "Synthesize requirements if needed, then produce complete generic IR in one pass.",
+      "primaryGoal": "Synthesize requirements if needed, then produce complete generic IR with DDD bounded contexts.",
       "skills": [
         "design-requirements-base",
         "design-generic-core",
@@ -27,8 +27,8 @@
         "design-generic-enricher"
       ],
       "mustRead": [
-        "config/core-design-model-schema.json",
-        "config/adr-blueprint.json",
+        "_config/core-design-model-schema.json",
+        "_config/adr-blueprint.json",
         "src/output_workflow/_internal/requirements_context.json",
         "src/output_workflow/_internal/technology_context.json"
       ],
@@ -38,32 +38,35 @@
         "src/output_workflow/_internal/core_design_model.md"
       ],
       "bestPractices": [
-        "Always run ADR synthesis before IR when requirements_context missing or adr upload empty",
-        "Apply security/data/messaging skills even when epic omits those sections",
-        "Use requirements_context.adr as authoritative when upload absent",
+        "boundedContexts[] mandatory with aggregates, entities, valueObjects, domainEvents",
+        "Map every capability and dataEntity to a bounded context",
         "Never emit stack-specific terms in IR"
       ]
     },
     "technology-adapter": {
       "label": "Technology Adapter",
-      "primaryGoal": "Map IR to stack artifacts using adapter skill + profile references.",
+      "primaryGoal": "Map IR to stack artifacts; abort if technology_context invalid.",
       "skills": ["*-adapter from registry"],
       "mustRead": [
         "src/output_workflow/_internal/core_design_model.json",
         "src/output_workflow/_internal/technology_context.json",
-        "config/technology-registry.json"
+        "_config/technology-registry.json"
       ],
       "outputs": ["src/output_workflow/_internal/**"],
+      "expectedArtifactsByProfile": {
+        "java-spring": ["Domain/DomainDesign.json", "Application/Design.json", "Application/openapi.yaml"],
+        "mulesoft": ["Integration/IntegrationDesign.json", "Integration/integration-apis.raml"],
+        "react": ["Presentation/PresentationDesign.json", "Presentation/PresentationStyle.json", "Application/Design.json"]
+      },
       "bestPractices": [
-        "Load only technology_context.profile.skill",
-        "Load each path in profile.references via skills tool",
-        "Render IR into reference template shapes — do not invent layout",
-        "Tune stack quality by editing references, not workflow prompts"
+        "If technology_context.error: re-bootstrap registry via curl before adapting",
+        "Load references via skills tool or curl fallback",
+        "Java: full DDD Domain layer; React: PresentationStyle; MuleSoft: API-led + error handlers"
       ]
     },
     "design-deliverable": {
       "label": "Design Deliverable",
-      "primaryGoal": "Two self-contained stakeholder files from internal workspace.",
+      "primaryGoal": "Two self-contained stakeholder files; report adapterStatus honestly.",
       "skills": ["design-deliverable"],
       "mustRead": ["src/output_workflow/_internal/"],
       "outputs": [
@@ -71,25 +74,36 @@
         "src/output_workflow/consolidated_design.json"
       ],
       "bestPractices": [
-        "Include synthesized ADR decisions in executive summary when upload was missing",
-        "Flag [SYNTHESIZED] and [REVIEW] assumptions prominently",
-        "IR wins on conflicts"
+        "Include DDD domain model section from IR and Domain/ artifacts",
+        "Include presentation style section for frontend profiles",
+        "Set meta.adapterStatus: complete | partial | missing"
       ]
     },
     "validation": {
       "label": "Validation Design",
-      "primaryGoal": "JSON quality gate; do not redesign.",
+      "primaryGoal": "JSON quality gate; CRITICAL on missing stack adaptation.",
       "skills": ["design-deliverable"],
       "mustRead": [
         "src/output_workflow/consolidated_design.md",
         "src/output_workflow/consolidated_design.json",
         "src/output_workflow/_internal/core_design_model.json",
+        "src/output_workflow/_internal/technology_context.json",
         "src/output_workflow/_internal/requirements_context.json"
       ],
       "outputs": ["validation JSON report in chat"],
+      "criticalChecks": [
+        "technology_context.json exists without error-only payload",
+        "profile artifacts exist for resolved profileId",
+        "IR boundedContexts non-empty for backend profiles",
+        "Java: Domain/DomainDesign.json present",
+        "React: Presentation/PresentationStyle.json present",
+        "MuleSoft: Integration/IntegrationDesign.json with apiLedLayers",
+        "meta.adapterStatus not missing when profile resolved",
+        "consolidated deliverables include DDD section when boundedContexts in IR"
+      ],
       "bestPractices": [
         "CRITICAL if deliverables missing — not if ADR was synthesized",
-        "Verify requirements_context documents all synthesized ADR keys",
+        "CRITICAL if adapter artifacts missing for resolved stack",
         "AUTO-fix only deterministic formatting issues"
       ]
     }

@@ -1,25 +1,34 @@
 ---
 name: java-adapter
 description: >-
-  Map IR to Java / Spring Boot internal artifacts. Primary goal: always produce
-  stack-specific files from IR + technology_context. Proceed with assumptions
-  when IR sections are empty. Load when technology_context.profile.skill is java-adapter.
+  Map IR to Java / Spring Boot internal artifacts with full DDD domain model.
+  Primary goal: always produce stack-specific files from IR + technology_context.
+  Proceed with assumptions when IR sections are empty. Load when
+  technology_context.profile.skill is java-adapter.
 ---
 
 # Java / Spring Boot Adapter
 
 ## Primary goal
 
-Transform `core_design_model.json` into **complete internal Java / Spring Boot design artifacts** under `_internal/` — using `technology_context.profile.skill`, `layerMapping`, and `artifacts` — **even when IR sections are partial or epic uploads were missing**.
+Transform `core_design_model.json` into **complete internal Java / Spring Boot design artifacts** under `_internal/` — including **DDD bounded contexts, aggregates, entities, value objects, domain events, and repositories** — using `technology_context.profile.skill`, `layerMapping`, and `artifacts`.
+
+## Bootstrap fallback (references)
+
+If `references/*` files are not visible next to `SKILL.md`, fetch from:
+
+`https://raw.githubusercontent.com/sanjz11/skills/main/java-adapter/references/<filename>`
+
+Use `command_line` (`curl -fsSL`) before proceeding without templates.
 
 ## Success criteria
 
-- [ ] Read `src/output_workflow/_internal/core_design_model.json` and `src/output_workflow/_internal/technology_context.json` first
-- [ ] Loaded skill matches `technology_context.profile.skill` (java-adapter)
-- [ ] Required profile artifacts written under `src/output_workflow/_internal/`
+- [ ] Read `src/output_workflow/_internal/core_design_model.json` and `technology_context.json` first
+- [ ] `technology_context` has valid `profile.skill` (not error-only) — if error, re-bootstrap registry per `design-technology-base` before adapting
+- [ ] **Domain layer complete:** `Domain/DomainDesign.json` maps every IR `boundedContexts[]` entry to aggregates, entities, value objects, domain events
+- [ ] Application layer maps controllers/services/repositories to IR capabilities and apiOperations
 - [ ] `legacyLogicMigration` rendered as **Java** pseudo-code in `.md` files with `// Legacy line N:` traceability
 - [ ] Each JSON artifact includes `meta.techProfile`, `meta.irVersion`, `meta.adapter`
-- [ ] Empty IR sections: skip file OR write minimal stub with `meta.assumptions` — never fail silently
 - [ ] No consolidated deliverables at workflow root
 
 ## Inputs
@@ -32,88 +41,65 @@ Transform `core_design_model.json` into **complete internal Java / Spring Boot d
 
 | IR layer | Java / Spring Boot artifacts |
 |----------|---------------------------|
-| presentation | @RestController, DTO, @Valid request objects |
-| business | @Service, domain logic, @Transactional boundaries |
-| data | @Repository, JPA Entity, Mapper |
-| integration | @FeignClient, @KafkaListener |
-| configuration | application.yml design, @Configuration |
+| boundedContexts | `@AggregateRoot`, domain entities, value objects, domain events |
+| presentation | `@RestController`, DTO, `@Valid` request objects |
+| business | `@Service`, application services, `@Transactional` boundaries |
+| data | `@Repository`, JPA Entity, Mapper, read-model projections |
+| integration | `@FeignClient`, `@KafkaListener`, outbox publisher |
+| configuration | `application.yml` design, `@Configuration`, feature flags |
 
-## Outputs
+## Outputs (all required when IR section non-empty)
 
+- `src/output_workflow/_internal/Domain/DomainDesign.json`
+- `src/output_workflow/_internal/Domain/DomainDesign.md`
 - `src/output_workflow/_internal/Application/Design.json`
 - `src/output_workflow/_internal/Application/Design.md`
 - `src/output_workflow/_internal/Application/openapi.yaml`
 - `src/output_workflow/_internal/Security/Security.json`
 - `src/output_workflow/_internal/Database/Database.json`
-- `src/output_workflow/_internal/Messaging/MessageDesign.json`
+- `src/output_workflow/_internal/Messaging/MessageDesign.json` (when IR.messaging non-empty)
 
-## Procedure
+## DDD procedure (mandatory)
 
-1. Read IR and technology context.
-2. Load this skill via skills tool.
-3. Map each non-empty IR layer per `layerMapping`.
-4. Generate openapi/contracts from `apiOperations` when profile includes them.
-5. Map `security`, `data`, `messaging` IR sections to folder JSONs when non-empty and category-relevant.
-6. Write all artifacts; bump `meta.v` on updates.
+1. For each IR `boundedContexts[]`: define package, aggregates (with root), entities, value objects, invariants.
+2. Map IR `capabilities` and `workflows` to **application services**; cite `businessRuleIds` on enforcing methods.
+3. Map IR `dataEntities` to JPA entities inside correct aggregate or read-model package.
+4. Map IR `domainEvents` / `messaging.events` to Spring events or outbox records.
+5. Controllers expose only `apiOperations` — delegate to application services, never embed business rules.
+6. Write `DomainDesign.md` with aggregate diagram (Mermaid) and aggregate boundary table.
 
-## Handling missing or incomplete inputs
+## Reference patterns (load or fetch)
 
-You must still produce adapter artifacts. IR is the source of truth.
-
-| Situation | What to do |
-|-----------|------------|
-| IR section empty | Skip that artifact file OR emit minimal stub documenting omission in artifact `meta.assumptions` |
-| apiOperations incomplete | Complete from capabilities using RESTful conventions; flag `[REVIEW]` in meta |
-| No legacyLogicMigration | Omit pseudo-code blocks — do not invent legacy |
-| technology_context partial | Re-read registry; never guess a different profile |
-| Epic never uploaded | Rely entirely on IR + technology_context |
-
-Stack-specific: If IR.security empty → minimal Security.json stub + assumption. If IR.messaging empty → skip MessageDesign.json.
-
-Use `clarify` only if `technology_context.profileId` conflicts with registry or IR stack hints.
-
-## Legacy migration
-
-For each `legacyLogicMigration[]` entry: **Java** pseudo-code in Design/Presentation `.md` with traceability comments.
-
-## Naming
-
-camelCase classes; PascalCase types; packages by bounded context.
-
-## Reference patterns (load via skills tool)
-
-Registry profile `java-spring` lists:
-
+- `references/ddd-pattern.md`
 - `references/controller-pattern.md`
 - `references/repository-pattern.md`
 - `references/Design-json-shape.json`
 
-Load each reference file from this adapter skill folder. **Render IR into reference JSON/Markdown shapes** — tune stack output by editing references in the skills repository, not orchestration prompts.
+Render IR into reference JSON/Markdown shapes.
 
 ## Best practices (Java / Spring Boot)
 
 - Constructor injection only; avoid field injection
 - OpenAPI 3.1 generated from IR apiOperations
-- Transactional boundaries on service layer not controllers
+- Transactional boundaries on application service layer, not controllers
+- One repository per aggregate root
+- Reference other aggregates by ID only
+- Map every `businessRules[]` entry to a domain or application enforcement point
 
-## Tuning strategy
+## Handling missing inputs
 
-| Change | Edit here | Do not edit |
-|--------|-----------|-------------|
-| Output file shape | `references/*-shape.json` | IR schema |
-| Layer mapping labels | `technology-registry.json` → layerMapping | generic skills |
-| Stack conventions | This SKILL.md + references | step orchestration prompts |
-| ADR defaults | registry `adrDefaults` | adr-blueprint keys list |
-
-Future phases: `implementationSkill` + `testingSkill` in bootstrapped registry (see `agent-contracts.json` in design-technology-base skill).
+| Situation | What to do |
+|-----------|------------|
+| IR `boundedContexts` empty | Infer one bounded context per major capability cluster; document in `meta.assumptions` |
+| IR section empty | Skip file OR minimal stub with `meta.assumptions` |
+| technology_context.error | Stop and re-bootstrap — do not emit generic layered design |
 
 ## Do not
 
-- Write `consolidated_design.md` or `consolidated_design.json`
-- Load a different adapter skill than `profile.skill`
-- Invent APIs or rules absent from IR (infer only with `meta.assumptions`)
-- Use a stack that does not match `technology_context.profileId` (java-spring)
+- Write consolidated deliverables
+- Omit Domain layer — DDD is mandatory for Java profile
+- Invent APIs absent from IR
 
 ## Completion gate
 
-All applicable outputs exist under `_internal/`; assumptions recorded for every inferred design element.
+`Domain/`, `Application/`, and applicable `Security/`/`Database/`/`Messaging/` folders populated; DDD traceability to IR ids complete.

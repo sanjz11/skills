@@ -32,6 +32,24 @@ Load when creating or updating the canonical IR **before** stack-specific adapta
 2. Read bundled `core-design-model-schema.json`.
 3. Write to `src/output_workflow/_internal/_config/core-design-model-schema.json`.
 
+### Bootstrap fallback
+
+If schema file not visible: `curl -fsSL https://raw.githubusercontent.com/sanjz11/skills/main/design-generic-core/core-design-model-schema.json` → write to `_config/`.
+
+## Domain model (DDD — mandatory in IR)
+
+Every IR must include rich **`boundedContexts[]`** even when epic omits DDD vocabulary:
+
+| Per bounded context | Required content |
+|---------------------|------------------|
+| Context | id, name, description, ubiquitous language glossary (optional) |
+| Aggregates | name, root entity, consistency boundary, related entities |
+| Entities | identity, lifecycle, key attributes (conceptual types only) |
+| Value objects | immutable attributes grouped by meaning |
+| Domain events | name, trigger, payload fields (when state changes matter) |
+
+Map every `capability`, `workflow`, and `dataEntity` to a bounded context. Downstream Java adapter depends on this structure.
+
 ## Procedure
 
 1. Ensure `_internal/_config/` is bootstrapped (registry, adr-blueprint, schema).
