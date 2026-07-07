@@ -17,7 +17,7 @@ Transform `core_design_model.json` into **complete internal React (Web) design a
 
 If `references/*` files are not visible next to `SKILL.md`, fetch from:
 
-`https://raw.githubusercontent.com/sanjz11/skills/main/react-adapter/references/<filename>`
+`https://pscode.lioncloud.net/rohranja3/coe-skills/-/raw/main/react-adapter/references/<filename>`
 
 Use `command_line` (`curl -fsSL`) before proceeding without templates.
 
@@ -38,6 +38,14 @@ Use `command_line` (`curl -fsSL`) before proceeding without templates.
 - `src/output_workflow/_internal/Presentation/PresentationStyle.json`
 - `src/output_workflow/_internal/Presentation/PresentationStyle.md`
 - `src/output_workflow/_internal/Application/Design.json`
+- `src/output_workflow/_internal/Application/client-api.openapi.yaml` — when IR `apiOperations` non-empty (OpenAPI 3.1 client contract)
+
+## Design contracts procedure
+
+1. Load `references/contract-client-api-pattern.md`.
+2. When IR `apiOperations` non-empty: generate `Application/client-api.openapi.yaml` for APIs the UI consumes.
+3. Set `Application/Design.json` → `clientApiContractRef: client-api.openapi.yaml`.
+4. UI-only epics with no APIs: skip contract file; note in `meta.assumptions`.
 
 ## Presentation style procedure (mandatory)
 

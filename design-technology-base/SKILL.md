@@ -1,91 +1,113 @@
 ---
 name: design-technology-base
 description: >-
-  Resolve technology profile and write technology_context.json. Bundles
-  technology-registry.json. Bootstraps _internal/_config/ from this skill — no
-  project workspace required.
+  Classify application archetype, resolve technology profile, and write
+  technology_context.json with executionContext (single loadedSkillPack).
+  Bootstraps _internal/_config/ from this skill.
 ---
 
-# Design Technology Base
+# Archetype & Technology Resolver
 
 ## Primary goal
 
-Bootstrap platform config from **this skill package**, then write valid `technology_context.json` — even when the user stack string is vague or misspelled.
+1. **Classify** the application archetype (engineering domain).
+2. **Resolve** the technology profile from registry + user inputs.
+3. **Emit** `technology_context.json` with `executionContext` — exactly **one** `loadedSkillPack` for downstream dependency injection.
 
 ## Bundled files (in this skill repo folder)
 
 | File | Purpose |
 |------|---------|
-| `technology-registry.json` | Stack profiles, aliases, layerMapping, references, adrDefaults |
-| `agent-contracts.json` | Per-step goals and best practices |
+| `technology-registry.json` | Archetypes, profiles, aliases, layerMapping, references |
+| `agent-contracts.json` | Per-step goals and archetype-aware best practices |
 
-## Bootstrap (required — no project workspace)
-
-Reunity has **no config workspace**. Config lives in skills on GitHub.
-
-**Before resolving the stack:**
+## Bootstrap (required)
 
 1. Load this skill via the `skills` tool.
-2. Read bundled `technology-registry.json` from this skill package.
-3. Write it to `src/output_workflow/_internal/_config/technology-registry.json`.
-4. Read bundled `agent-contracts.json` and write to `src/output_workflow/_internal/_config/agent-contracts.json`.
+2. Read bundled JSON; write to `src/output_workflow/_internal/_config/`.
+3. If bundled files not visible, curl from `https://pscode.lioncloud.net/rohranja3/coe-skills/-/raw/main/design-technology-base/`.
 
-All later steps read from `src/output_workflow/_internal/_config/` — never from `config/`.
+## Archetype classification (mandatory — before profile match)
 
-### Bootstrap fallback (when bundled JSON not visible)
+Classify from **all** signals (priority: ADR > epic > user `architecture_type` > registry default):
 
-Reunity may expose only `SKILL.md` to `read_file`. If sibling files are missing from the skill package snapshot:
+| archetype.id | When to use |
+|--------------|-------------|
+| `backend-service` | APIs, services, persistence, domain logic — Java, .NET, Node, Python |
+| `web-ui` | Web pages, components, routing — React, Angular, Vue |
+| `mobile-ui` | Mobile screens, navigation, device APIs — React Native, Flutter |
+| `integration-service` | ESB, iPaaS, message flows — MuleSoft, Camel, IIB |
+| `data-pipeline` | ETL, batch, data quality — Informatica, Talend, ADF |
 
-1. Fetch with `command_line`:
-   - `curl -fsSL https://raw.githubusercontent.com/sanjz11/skills/main/design-technology-base/technology-registry.json`
-   - `curl -fsSL https://raw.githubusercontent.com/sanjz11/skills/main/design-technology-base/agent-contracts.json`
-2. Write fetched content to `_internal/_config/` paths above.
-3. **Never** write error-only `technology_context.json` until both fetches fail.
+Use `categoryArchetypeMap` in registry when `architecture_type` is set. Override when epic/ADR clearly describe a different domain (e.g. MuleSoft flows with `architecture_type: backend` → `integration-service`).
 
-If fetch fails, retry once; then write `technology_context.json` with `error` **and** `meta.bootstrapAttempted: true` documenting URLs tried.
+## Technology profile resolution
 
-If `_config/` files already exist (UPDATE run), refresh only when registry skill version changed or change_requirements says so.
+1. Match `target_technology_stack` to `profiles.*.aliases`.
+2. If no match: use category default profile for classified archetype.
+3. Verify profile `category` is compatible with archetype (note mismatch in `meta.assumptions` if not).
+
+## technology_context.json shape (required)
+
+```json
+{
+  "meta": { "v": "1.0", "ts": "ISO8601", "assumptions": [] },
+  "archetype": {
+    "id": "backend-service",
+    "label": "Backend Services",
+    "source": "registry | epic | adr | user"
+  },
+  "executionContext": {
+    "loadedSkillPack": "java-adapter",
+    "designCapabilities": [],
+    "skillResolution": {
+      "mode": "single-pack",
+      "resolvedAt": "archetype-technology-resolver"
+    }
+  },
+  "profileId": "java-spring",
+  "profile": {
+    "skill": "java-adapter",
+    "displayName": "...",
+    "category": "backend",
+    "designContracts": [],
+    "layerMapping": {},
+    "artifacts": [],
+    "references": [],
+    "bestPractices": []
+  }
+}
+```
+
+Populate `executionContext.designCapabilities` from `registry.archetypes[archetype.id].designCapabilities`.
+
+Copy `profile.designContracts[]` verbatim from registry profile into `technology_context.profile.designContracts`.
+
+Set `executionContext.loadedSkillPack` = `profile.skill` (exactly one string).
 
 ## Success criteria
 
-- [ ] `_internal/_config/technology-registry.json` bootstrapped from this skill
-- [ ] `technology_context.json` exists under `_internal/`
-- [ ] `profileId` and `profile.skill` match a registry entry
-- [ ] `layerMapping`, `artifacts`, `references`, `bestPractices`, `adrDefaults` copied from profile
-- [ ] `meta.assumptions` explains any fuzzy match
-
-## Procedure
-
-1. Bootstrap config (above).
-2. Read `_internal/_config/technology-registry.json`.
-3. Match `target_technology_stack` to `profiles.*.aliases` (case-insensitive).
-4. If no match: map `architecture_type` → category default profile.
-5. Set `enabled_domains` from category + ADR hints.
-6. Write `_internal/technology_context.json` with full profile fields.
-7. Bump `meta.v` on UPDATE when profile unchanged.
+- [ ] `_config/technology-registry.json` bootstrapped
+- [ ] `archetype.id` classified and documented
+- [ ] `executionContext.loadedSkillPack` set to single adapter skill name
+- [ ] `profile.designContracts[]` copied from registry
+- [ ] `profile.skill` matches `loadedSkillPack`
+- [ ] No error-only context without curl fallback attempt
 
 ## Handling missing inputs
 
 | Situation | What to do |
 |-----------|------------|
-| Empty stack name | Category default profile from bootstrapped registry |
-| Registry file missing in run | Bootstrap from this skill first — do not guess without registry |
-| ADR/epic imply different stack | Note in `meta.assumptions`; prefer user unless ADR overrides |
-
-## Category guidance
-
-| Category | Primary contracts | Typical folders |
-|----------|-------------------|-----------------|
-| backend / fullstack | OpenAPI 3.1 | Application/, Security/, Database/ |
-| integration | RAML / OpenAPI + AsyncAPI | Integration/, Messaging/ |
-| frontend / mobile | Client API contracts | Presentation/, Application/ |
+| Empty stack name | Category default profile for classified archetype |
+| Ambiguous epic | Prefer `architecture_type`; document in assumptions |
+| ADR conflicts with stack | Note in assumptions; prefer ADR for archetype, user for profile when explicit |
 
 ## Extending stacks
 
-1. Edit `technology-registry.json` in this skill on GitHub (add profile + references).
-2. Add adapter skill with `references/`.
-3. Push skills repo — no orchestration changes.
+1. Add profile + archetype mapping in `technology-registry.json`.
+2. Publish adapter skill pack on PSCode.
+3. No workflow graph changes — resolver picks the new pack.
 
 ## Completion gate
 
-Config bootstrapped, context written, profile traceable to registry.
+Archetype classified, single skill pack resolved, executionContext written.

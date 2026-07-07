@@ -1,23 +1,22 @@
 {
-  "version": "1.1",
-  "strategy": "Personas hold goals and guardrails. Workflow prompts orchestrate only. Skills hold domain depth. Registry + adr-blueprint hold defaults. Adapter references hold stack patterns. Tune skills/references per stack — never IR schema or generic skills.",
+  "version": "2.1",
+  "strategy": "Archetype-first design: classify engineering domain → resolve one technology profile → build archetype-aware IR → load exactly one design skill pack via resolver. Adapter emits stack-specific designContracts (OpenAPI, RAML, AsyncAPI).",
   "agents": {
-    "technology-context": {
-      "label": "Technology Context Builder",
-      "primaryGoal": "Bootstrap config and write valid technology_context.json; never block on missing ADR.",
+    "archetype-technology-resolver": {
+      "label": "Archetype & Technology Resolver",
+      "primaryGoal": "Classify application archetype, resolve technology profile, emit executionContext with single loadedSkillPack.",
       "skills": ["design-technology-base", "design-requirements-base"],
       "mustRead": ["_config/technology-registry.json", "_config/adr-blueprint.json"],
-      "outputs": ["src/output_workflow/_internal/technology_context.json"],
+      "outputs": ["src/output_workflow/_internal/technology_context.json", "src/output_workflow/_internal/inputs_manifest.json"],
       "bestPractices": [
-        "Try skill-package read first; curl raw GitHub URLs if bundled JSON not visible",
-        "Never write error-only technology_context without attempting curl fallback",
-        "Fuzzy-match stack aliases before falling back to category default",
-        "Copy layerMapping, artifacts, references from registry profile verbatim"
+        "Classify every upload by content before archetype resolution",
+        "Copy profile.designContracts into technology_context.profile",
+        "Write executionContext.loadedSkillPack = profile.skill (exactly one adapter)"
       ]
     },
     "core-ir": {
       "label": "Core Design Model",
-      "primaryGoal": "Synthesize requirements if needed, then produce complete generic IR with DDD bounded contexts.",
+      "primaryGoal": "Produce archetype-aware technology-independent IR per archetypeRules in schema.",
       "skills": [
         "design-requirements-base",
         "design-generic-core",
@@ -28,8 +27,7 @@
       ],
       "mustRead": [
         "_config/core-design-model-schema.json",
-        "_config/adr-blueprint.json",
-        "src/output_workflow/_internal/requirements_context.json",
+        "src/output_workflow/_internal/inputs_manifest.json",
         "src/output_workflow/_internal/technology_context.json"
       ],
       "outputs": [
@@ -38,15 +36,14 @@
         "src/output_workflow/_internal/core_design_model.md"
       ],
       "bestPractices": [
-        "boundedContexts[] mandatory with aggregates, entities, valueObjects, domainEvents",
-        "Map every capability and dataEntity to a bounded context",
-        "Never emit stack-specific terms in IR"
+        "apiOperations[] must be complete enough for downstream OpenAPI/RAML generation",
+        "messaging section complete when asyncapi contract applies"
       ]
     },
-    "technology-adapter": {
-      "label": "Technology Adapter",
-      "primaryGoal": "Map IR to stack artifacts; abort if technology_context invalid.",
-      "skills": ["*-adapter from registry"],
+    "design-skill-adapter": {
+      "label": "Design Skill Adapter",
+      "primaryGoal": "Load one skill pack; map IR to stack artifacts including mandatory designContracts.",
+      "skills": ["design-skill-resolver"],
       "mustRead": [
         "src/output_workflow/_internal/core_design_model.json",
         "src/output_workflow/_internal/technology_context.json",
@@ -55,18 +52,42 @@
       "outputs": ["src/output_workflow/_internal/**"],
       "expectedArtifactsByProfile": {
         "java-spring": ["Domain/DomainDesign.json", "Application/Design.json", "Application/openapi.yaml"],
+        "nodejs": ["Application/Design.json", "Application/openapi.yaml"],
+        "python": ["Application/Design.json", "Application/openapi.yaml"],
+        "dotnet": ["Application/Design.json", "Application/openapi.yaml"],
+        "generic-backend": ["Application/Design.json", "Application/openapi.yaml"],
         "mulesoft": ["Integration/IntegrationDesign.json", "Integration/integration-apis.raml"],
-        "react": ["Presentation/PresentationDesign.json", "Presentation/PresentationStyle.json", "Application/Design.json"]
+        "react": ["Presentation/PresentationDesign.json", "Presentation/PresentationStyle.json", "Application/Design.json", "Application/client-api.openapi.yaml"],
+        "react-native": ["Presentation/PresentationDesign.json", "Application/Design.json", "Application/client-api.openapi.yaml"],
+        "angular": ["Presentation/PresentationDesign.json", "Application/Design.json", "Application/client-api.openapi.yaml"]
+      },
+      "designContractsByProfile": {
+        "java-spring": ["Application/openapi.yaml"],
+        "nodejs": ["Application/openapi.yaml"],
+        "python": ["Application/openapi.yaml"],
+        "dotnet": ["Application/openapi.yaml"],
+        "generic-backend": ["Application/openapi.yaml"],
+        "mulesoft": ["Integration/integration-apis.raml"],
+        "react": ["Application/client-api.openapi.yaml"],
+        "react-native": ["Application/client-api.openapi.yaml"],
+        "angular": ["Application/client-api.openapi.yaml"]
+      },
+      "optionalContractsByProfile": {
+        "java-spring": ["Messaging/asyncapi.yaml"],
+        "mulesoft": ["Messaging/asyncapi.yaml"],
+        "nodejs": ["Messaging/asyncapi.yaml"],
+        "python": ["Messaging/asyncapi.yaml"],
+        "dotnet": ["Messaging/asyncapi.yaml"]
       },
       "bestPractices": [
-        "If technology_context.error: re-bootstrap registry via curl before adapting",
-        "Load references via skills tool or curl fallback",
-        "Java: full DDD Domain layer; React: PresentationStyle; MuleSoft: API-led + error handlers"
+        "Generate every mandatory designContract from profile.designContracts",
+        "OpenAPI/RAML paths and operations must align with IR apiOperations",
+        "Emit optional asyncapi when IR messaging non-empty"
       ]
     },
     "design-deliverable": {
       "label": "Design Deliverable",
-      "primaryGoal": "Two self-contained stakeholder files; report adapterStatus honestly.",
+      "primaryGoal": "Two stakeholder files; include design contract summary and paths.",
       "skills": ["design-deliverable"],
       "mustRead": ["src/output_workflow/_internal/"],
       "outputs": [
@@ -74,48 +95,28 @@
         "src/output_workflow/consolidated_design.json"
       ],
       "bestPractices": [
-        "Include DDD domain model section from IR and Domain/ artifacts",
-        "Include presentation style section for frontend profiles",
-        "Set meta.adapterStatus: complete | partial | missing"
+        "Include designContracts section with format, path, operation count",
+        "Flag missing mandatory contracts in meta.missingContracts[]"
       ]
     },
     "validation": {
       "label": "Validation Design",
-      "primaryGoal": "JSON quality gate; CRITICAL on missing stack adaptation.",
+      "primaryGoal": "JSON quality gate; CRITICAL on missing mandatory design contracts.",
       "skills": ["design-deliverable"],
       "mustRead": [
         "src/output_workflow/consolidated_design.md",
-        "src/output_workflow/consolidated_design.json",
         "src/output_workflow/_internal/core_design_model.json",
-        "src/output_workflow/_internal/technology_context.json",
-        "src/output_workflow/_internal/requirements_context.json"
+        "src/output_workflow/_internal/technology_context.json"
       ],
-      "outputs": ["validation JSON report in chat"],
       "criticalChecks": [
-        "technology_context.json exists without error-only payload",
-        "profile artifacts exist for resolved profileId",
-        "IR boundedContexts non-empty for backend profiles",
-        "Java: Domain/DomainDesign.json present",
-        "React: Presentation/PresentationStyle.json present",
-        "MuleSoft: Integration/IntegrationDesign.json with apiLedLayers",
-        "meta.adapterStatus not missing when profile resolved",
-        "consolidated deliverables include DDD section when boundedContexts in IR"
-      ],
-      "bestPractices": [
-        "CRITICAL if deliverables missing — not if ADR was synthesized",
-        "CRITICAL if adapter artifacts missing for resolved stack",
-        "AUTO-fix only deterministic formatting issues"
+        "technology_context.profile.designContracts present",
+        "Mandatory designContract files exist for profileId",
+        "Backend: Application/openapi.yaml matches IR apiOperations count",
+        "MuleSoft: Integration/integration-apis.raml present and valid RAML header",
+        "Frontend: Application/client-api.openapi.yaml when IR apiOperations non-empty",
+        "OpenAPI/RAML operations align with IR — no invented endpoints",
+        "meta.adapterStatus not missing when profile resolved"
       ]
-    }
-  },
-  "phasesFuture": {
-    "implementation": {
-      "pattern": "generic implementation persona + {profile.implementationSkill} + references/implementation/",
-      "registryField": "implementationSkill"
-    },
-    "testing": {
-      "pattern": "generic testing persona + {profile.testingSkill} + references/testing/",
-      "registryField": "testingSkill"
     }
   }
 }

@@ -2,59 +2,62 @@
 name: design-deliverable
 description: >-
   Produce consolidated stakeholder deliverables. Primary goal: always output
-  two self-contained files from whatever internal artifacts exist. Fill gaps
-  from IR with documented assumptions.
+  two self-contained files from IR + single-pack adapter artifacts. Archetype-
+  appropriate sections; honest adapterStatus.
 ---
 
 # Design Deliverable
 
 ## Primary goal
 
-Always produce **exactly two** shareable files at `src/output_workflow/` root — `consolidated_design.md` and `consolidated_design.json` — self-contained and consistent, built from whatever exists in `_internal/`.
+Always produce **exactly two** shareable files at `src/output_workflow/` root — self-contained, archetype-appropriate, with honest `meta.adapterStatus`.
 
-## Success criteria
+## Archetype-aware sections
 
-- [ ] `consolidated_design.md` exists — complete human-readable design
-- [ ] `consolidated_design.json` exists — valid JSON aligned with `.md`
-- [ ] `meta.adapterStatus`: `complete` | `partial` | `missing` (honest assessment)
-- [ ] No third shareable file at workflow root
-- [ ] Stack-specific sections inlined when adapter artifacts exist
+Include sections matching `technology_context.archetype.id`:
+
+| Archetype | Mandatory deliverable emphasis |
+|-----------|-------------------------------|
+| `backend-service` | DDD domain model, APIs, persistence, messaging |
+| `web-ui` | User journeys, screens, navigation, presentation style |
+| `mobile-ui` | Screens, navigation, device/offline concerns, style |
+| `integration-service` | Integration flows, connectors, transforms, error handling |
+| `data-pipeline` | Pipeline design, mappings, DQ rules, scheduling |
+
+## consolidated_design.json meta (required)
+
+```json
+"meta": {
+  "archetypeId": "...",
+  "loadedSkillPack": "...",
+  "adapterStatus": "complete | partial | missing",
+  "missingArtifacts": [],
+  "missingContracts": [],
+  "designContracts": [
+    { "id": "...", "format": "openapi|raml|asyncapi", "path": "...", "operationCount": 0, "status": "present|missing|n/a" }
+  ]
+}
+```
+
+Copy `loadedSkillPack` from `technology_context.executionContext`. Populate `designContracts` from `technology_context.profile.designContracts` and verify files exist under `_internal/`. List mandatory missing paths in `missingContracts[]`.
 
 ## Mandatory sections in consolidated_design.md
 
 1. Executive summary
-2. Technology stack (from `technology_context`)
+2. Application archetype + technology stack
 3. Requirements and scope
-4. **Domain model (DDD)** — bounded contexts, aggregates, entities, value objects (from IR + `Domain/DomainDesign` when Java)
-5. Business rules (full)
-6. Legacy migration (full pseudo-code from adapter `.md` files)
-7. Architecture + Mermaid diagrams
-8. APIs / contracts
-9. Security, data, messaging (when in IR or adapter artifacts)
-10. **Presentation style** (frontend) — design tokens, layout, component styles from `PresentationStyle.*`
-11. **Integration design** (MuleSoft) — API-led layers, flows, connectors, error handlers from `Integration/*`
-12. NFR and deployment
-
-## consolidated_design.json shape
-
-Include: `technology`, `coreModelSummary`, `adaptedDesign`, `domainModel`, `apiSummary`, `meta`.
-
-Set `meta.adapterStatus` and list `meta.missingArtifacts[]` when adapter step did not produce expected files.
+4. **Archetype primary model** (DDD / UX / integration flows / data pipelines)
+5. Business rules
+6. Legacy migration (pseudo-code from adapter `.md`)
+7. Architecture + Mermaid
+8. Stack-specific inlined design from adapter artifacts
+9. **Design contracts** — format, path, operation/event count per `profile.designContracts`
+10. NFR and deployment
 
 ## Handling missing adapter artifacts
 
-| Situation | What to do |
-|-----------|------------|
-| Adapter artifacts missing | Set `adapterStatus: missing`; consolidate from IR; flag `[ADAPTER GAP]` prominently |
-| Domain/DomainDesign missing (Java) | Include IR `boundedContexts` in deliverable; flag gap |
-| PresentationStyle missing (React) | Include minimal token table from epic; flag gap |
-| IntegrationDesign missing (MuleSoft) | Do not claim MuleSoft-specific design; flag gap |
-
-## Do not
-
-- Hide adapter failures — validation downstream depends on honest `adapterStatus`
-- Say "see `_internal/` folder" — inline essential content
+Set `adapterStatus: missing`; flag `[ADAPTER GAP]`; consolidate from IR. Do not claim stack-specific design without adapter artifacts.
 
 ## Completion gate
 
-Two root files exist; `adapterStatus` accurate; DDD and stack-specific sections present when artifacts exist.
+Two root files; `archetypeId` + `loadedSkillPack` + `adapterStatus` accurate.

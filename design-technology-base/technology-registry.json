@@ -8,6 +8,273 @@
     "integration",
     "configuration"
   ],
+  "archetypes": {
+    "backend-service": {
+      "label": "Backend Services",
+      "description": "APIs, business logic, persistence, messaging — Java, .NET, Node, Python, Go",
+      "categories": [
+        "backend",
+        "fullstack",
+        "cloud"
+      ],
+      "defaultCategory": "backend",
+      "irEmphasis": [
+        "boundedContexts",
+        "capabilities",
+        "businessRules",
+        "apiOperations",
+        "data",
+        "messaging",
+        "security"
+      ],
+      "irRequiredSections": [
+        "boundedContexts",
+        "capabilities",
+        "businessRules",
+        "apiOperations"
+      ],
+      "designCapabilities": [
+        {
+          "id": "design-api-contract",
+          "label": "API contract",
+          "mapsTo": "Application/ + openapi"
+        },
+        {
+          "id": "design-domain-model",
+          "label": "Domain model (DDD)",
+          "mapsTo": "Domain/"
+        },
+        {
+          "id": "design-application-services",
+          "label": "Application services",
+          "mapsTo": "Application/"
+        },
+        {
+          "id": "design-persistence",
+          "label": "Persistence",
+          "mapsTo": "Database/"
+        },
+        {
+          "id": "design-messaging",
+          "label": "Messaging",
+          "mapsTo": "Messaging/"
+        },
+        {
+          "id": "design-security",
+          "label": "Security",
+          "mapsTo": "Security/"
+        }
+      ]
+    },
+    "web-ui": {
+      "label": "Web Applications",
+      "description": "Pages, components, routing, state, API clients — React, Angular, Vue",
+      "categories": [
+        "frontend"
+      ],
+      "defaultCategory": "frontend",
+      "irEmphasis": [
+        "userExperience",
+        "capabilities",
+        "apiOperations",
+        "security"
+      ],
+      "irRequiredSections": [
+        "userExperience",
+        "capabilities"
+      ],
+      "designCapabilities": [
+        {
+          "id": "design-screens",
+          "label": "Screens / views",
+          "mapsTo": "Presentation/PresentationDesign"
+        },
+        {
+          "id": "design-navigation",
+          "label": "Navigation",
+          "mapsTo": "Presentation/PresentationDesign"
+        },
+        {
+          "id": "design-components",
+          "label": "Reusable components",
+          "mapsTo": "Presentation/PresentationDesign"
+        },
+        {
+          "id": "design-state",
+          "label": "Client state",
+          "mapsTo": "Application/Design"
+        },
+        {
+          "id": "design-api-client",
+          "label": "API client",
+          "mapsTo": "Application/Design"
+        },
+        {
+          "id": "design-presentation-style",
+          "label": "Visual style",
+          "mapsTo": "Presentation/PresentationStyle"
+        }
+      ]
+    },
+    "mobile-ui": {
+      "label": "Mobile Applications",
+      "description": "Screens, navigation, device features, offline — React Native, Flutter",
+      "categories": [
+        "mobile"
+      ],
+      "defaultCategory": "mobile",
+      "irEmphasis": [
+        "userExperience",
+        "capabilities",
+        "apiOperations",
+        "integrations",
+        "security"
+      ],
+      "irRequiredSections": [
+        "userExperience",
+        "capabilities"
+      ],
+      "designCapabilities": [
+        {
+          "id": "design-screens",
+          "label": "Screens",
+          "mapsTo": "Presentation/PresentationDesign"
+        },
+        {
+          "id": "design-navigation",
+          "label": "Navigation stack",
+          "mapsTo": "Presentation/PresentationDesign"
+        },
+        {
+          "id": "design-device-capabilities",
+          "label": "Device permissions & APIs",
+          "mapsTo": "Application/Design"
+        },
+        {
+          "id": "design-offline-storage",
+          "label": "Offline / local storage",
+          "mapsTo": "Application/Design"
+        },
+        {
+          "id": "design-api-client",
+          "label": "API client",
+          "mapsTo": "Application/Design"
+        },
+        {
+          "id": "design-presentation-style",
+          "label": "Visual style",
+          "mapsTo": "Presentation/PresentationStyle"
+        }
+      ]
+    },
+    "integration-service": {
+      "label": "Integration / ESB",
+      "description": "Flows, connectors, transforms, routing — MuleSoft, Camel, IIB, TIBCO",
+      "categories": [
+        "integration"
+      ],
+      "defaultCategory": "integration",
+      "irEmphasis": [
+        "integrationFlows",
+        "integrations",
+        "messaging",
+        "apiOperations",
+        "businessRules",
+        "security"
+      ],
+      "irRequiredSections": [
+        "integrationFlows",
+        "integrations",
+        "capabilities"
+      ],
+      "designCapabilities": [
+        {
+          "id": "design-integration-flow",
+          "label": "Integration flows",
+          "mapsTo": "Integration/IntegrationDesign"
+        },
+        {
+          "id": "design-connectors",
+          "label": "Source/target connectors",
+          "mapsTo": "Integration/IntegrationDesign"
+        },
+        {
+          "id": "design-transformation",
+          "label": "Message transformation",
+          "mapsTo": "Integration/IntegrationDesign"
+        },
+        {
+          "id": "design-routing",
+          "label": "Content-based routing",
+          "mapsTo": "Integration/IntegrationDesign"
+        },
+        {
+          "id": "design-error-handling",
+          "label": "Exception & retry handling",
+          "mapsTo": "Integration/IntegrationDesign"
+        },
+        {
+          "id": "design-api-led-contracts",
+          "label": "API-led contracts",
+          "mapsTo": "Integration/*.raml"
+        }
+      ]
+    },
+    "data-pipeline": {
+      "label": "Data & ETL",
+      "description": "Pipelines, mappings, data quality — Informatica, Talend, ADF, Spark",
+      "categories": [
+        "data"
+      ],
+      "defaultCategory": "data",
+      "irEmphasis": [
+        "dataPipelines",
+        "dataEntities",
+        "integrations",
+        "businessRules"
+      ],
+      "irRequiredSections": [
+        "dataPipelines",
+        "capabilities"
+      ],
+      "designCapabilities": [
+        {
+          "id": "design-pipeline",
+          "label": "Data pipeline",
+          "mapsTo": "Data/PipelineDesign"
+        },
+        {
+          "id": "design-source-target",
+          "label": "Sources & targets",
+          "mapsTo": "Data/PipelineDesign"
+        },
+        {
+          "id": "design-mapping",
+          "label": "Field mapping",
+          "mapsTo": "Data/PipelineDesign"
+        },
+        {
+          "id": "design-data-quality",
+          "label": "Validation & DQ rules",
+          "mapsTo": "Data/PipelineDesign"
+        },
+        {
+          "id": "design-scheduling",
+          "label": "Scheduling & orchestration",
+          "mapsTo": "Data/PipelineDesign"
+        }
+      ]
+    }
+  },
+  "categoryArchetypeMap": {
+    "backend": "backend-service",
+    "fullstack": "backend-service",
+    "cloud": "backend-service",
+    "frontend": "web-ui",
+    "mobile": "mobile-ui",
+    "integration": "integration-service",
+    "data": "data-pipeline"
+  },
   "categories": {
     "backend": {
       "label": "Backend / API Services",
@@ -108,7 +375,8 @@
         "DomainDesign.md",
         "Design.json",
         "Design.md",
-        "openapi.yaml"
+        "openapi.yaml",
+        "asyncapi.yaml"
       ],
       "testing": [
         "JUnit",
@@ -130,7 +398,9 @@
         "references/ddd-pattern.md",
         "references/controller-pattern.md",
         "references/repository-pattern.md",
-        "references/Design-json-shape.json"
+        "references/Design-json-shape.json",
+        "references/contract-openapi-pattern.md",
+        "references/contract-asyncapi-pattern.md"
       ],
       "implementationSkill": "java-implementation",
       "testingSkill": "java-testing",
@@ -141,6 +411,25 @@
         "Map every IR boundedContext to Domain/DomainDesign with aggregates and aggregate roots",
         "Map every businessRule id to a domain or application enforcement point",
         "One repository per aggregate root; reference other aggregates by ID only"
+      ],
+      "designContracts": [
+        {
+          "id": "primary-api",
+          "format": "openapi",
+          "version": "3.1",
+          "path": "Application/openapi.yaml",
+          "source": "apiOperations",
+          "mandatory": true
+        },
+        {
+          "id": "async-messaging",
+          "format": "asyncapi",
+          "version": "2.6",
+          "path": "Messaging/asyncapi.yaml",
+          "source": "messaging",
+          "mandatory": false,
+          "when": "IR messaging.events or messaging.commands non-empty"
+        }
       ]
     },
     "react-native": {
@@ -188,7 +477,8 @@
       "artifacts": [
         "PresentationDesign.json",
         "PresentationDesign.md",
-        "Design.json"
+        "Design.json",
+        "client-api.openapi.yaml"
       ],
       "testing": [
         "Jest",
@@ -207,13 +497,25 @@
       },
       "references": [
         "references/screen-navigation-pattern.md",
-        "references/PresentationDesign-json-shape.json"
+        "references/PresentationDesign-json-shape.json",
+        "references/contract-client-api-pattern.md"
       ],
       "implementationSkill": "react-native-implementation",
       "testingSkill": "react-native-testing",
       "bestPractices": [
         "Screens map to IR presentation layer capabilities",
         "No server-side code in presentation artifacts"
+      ],
+      "designContracts": [
+        {
+          "id": "client-api",
+          "format": "openapi",
+          "version": "3.1",
+          "path": "Application/client-api.openapi.yaml",
+          "source": "apiOperations",
+          "mandatory": true,
+          "when": "IR apiOperations non-empty"
+        }
       ]
     },
     "mulesoft": {
@@ -257,7 +559,8 @@
       "artifacts": [
         "IntegrationDesign.json",
         "IntegrationDesign.md",
-        "integration-apis.raml"
+        "integration-apis.raml",
+        "asyncapi.yaml"
       ],
       "testing": [
         "MUnit"
@@ -276,7 +579,9 @@
       "references": [
         "references/api-led-pattern.md",
         "references/connector-error-handler-pattern.md",
-        "references/IntegrationDesign-json-shape.json"
+        "references/IntegrationDesign-json-shape.json",
+        "references/contract-raml-pattern.md",
+        "references/contract-asyncapi-pattern.md"
       ],
       "implementationSkill": "mulesoft-implementation",
       "testingSkill": "mulesoft-testing",
@@ -287,6 +592,25 @@
         "Connectors named and configured from IR integrations with externalized properties",
         "Correlation ID propagation across async commands and sync health probes",
         "MUnit coverage for each main process flow including retry and failure paths"
+      ],
+      "designContracts": [
+        {
+          "id": "experience-api",
+          "format": "raml",
+          "version": "1.0",
+          "path": "Integration/integration-apis.raml",
+          "source": "apiOperations",
+          "mandatory": true
+        },
+        {
+          "id": "async-messaging",
+          "format": "asyncapi",
+          "version": "2.6",
+          "path": "Messaging/asyncapi.yaml",
+          "source": "messaging",
+          "mandatory": false,
+          "when": "IR messaging.events or messaging.commands non-empty"
+        }
       ]
     },
     "react": {
@@ -332,7 +656,8 @@
         "PresentationDesign.json",
         "PresentationDesign.md",
         "PresentationStyle.json",
-        "PresentationStyle.md"
+        "PresentationStyle.md",
+        "client-api.openapi.yaml"
       ],
       "testing": [
         "Jest",
@@ -350,7 +675,8 @@
         "references/page-component-pattern.md",
         "references/presentation-style-pattern.md",
         "references/PresentationDesign-json-shape.json",
-        "references/PresentationStyle-json-shape.json"
+        "references/PresentationStyle-json-shape.json",
+        "references/contract-client-api-pattern.md"
       ],
       "implementationSkill": "react-implementation",
       "testingSkill": "react-testing",
@@ -360,6 +686,17 @@
         "PresentationStyle.json with design tokens and per-view CSS guidance on every run",
         "Loading-empty-error-success states styled via shared token catalog",
         "Centralize colors/spacing/typography as CSS variables — no hardcoded values in component specs"
+      ],
+      "designContracts": [
+        {
+          "id": "client-api",
+          "format": "openapi",
+          "version": "3.1",
+          "path": "Application/client-api.openapi.yaml",
+          "source": "apiOperations",
+          "mandatory": true,
+          "when": "IR apiOperations non-empty"
+        }
       ]
     },
     "angular": {
@@ -400,7 +737,8 @@
       },
       "artifacts": [
         "PresentationDesign.json",
-        "PresentationDesign.md"
+        "PresentationDesign.md",
+        "client-api.openapi.yaml"
       ],
       "testing": [
         "Jasmine",
@@ -416,13 +754,25 @@
       },
       "references": [
         "references/module-routing-pattern.md",
-        "references/PresentationDesign-json-shape.json"
+        "references/PresentationDesign-json-shape.json",
+        "references/contract-client-api-pattern.md"
       ],
       "implementationSkill": "angular-implementation",
       "testingSkill": "angular-testing",
       "bestPractices": [
         "Feature modules per bounded context",
         "RxJS for async streams"
+      ],
+      "designContracts": [
+        {
+          "id": "client-api",
+          "format": "openapi",
+          "version": "3.1",
+          "path": "Application/client-api.openapi.yaml",
+          "source": "apiOperations",
+          "mandatory": true,
+          "when": "IR apiOperations non-empty"
+        }
       ]
     },
     "nodejs": {
@@ -465,7 +815,8 @@
       },
       "artifacts": [
         "Design.json",
-        "openapi.yaml"
+        "openapi.yaml",
+        "asyncapi.yaml"
       ],
       "testing": [
         "Jest"
@@ -481,13 +832,34 @@
       },
       "references": [
         "references/nestjs-module-pattern.md",
-        "references/Design-json-shape.json"
+        "references/Design-json-shape.json",
+        "references/contract-openapi-pattern.md",
+        "references/contract-asyncapi-pattern.md"
       ],
       "implementationSkill": "nodejs-implementation",
       "testingSkill": "nodejs-testing",
       "bestPractices": [
         "NestJS modules by bounded context",
         "DTO validation at controller"
+      ],
+      "designContracts": [
+        {
+          "id": "primary-api",
+          "format": "openapi",
+          "version": "3.1",
+          "path": "Application/openapi.yaml",
+          "source": "apiOperations",
+          "mandatory": true
+        },
+        {
+          "id": "async-messaging",
+          "format": "asyncapi",
+          "version": "2.6",
+          "path": "Messaging/asyncapi.yaml",
+          "source": "messaging",
+          "mandatory": false,
+          "when": "IR messaging.events or messaging.commands non-empty"
+        }
       ]
     },
     "python": {
@@ -529,7 +901,8 @@
       },
       "artifacts": [
         "Design.json",
-        "openapi.yaml"
+        "openapi.yaml",
+        "asyncapi.yaml"
       ],
       "testing": [
         "pytest"
@@ -545,13 +918,34 @@
       },
       "references": [
         "references/fastapi-router-pattern.md",
-        "references/Design-json-shape.json"
+        "references/Design-json-shape.json",
+        "references/contract-openapi-pattern.md",
+        "references/contract-asyncapi-pattern.md"
       ],
       "implementationSkill": "python-implementation",
       "testingSkill": "python-testing",
       "bestPractices": [
         "Pydantic schemas at router boundary",
         "snake_case modules"
+      ],
+      "designContracts": [
+        {
+          "id": "primary-api",
+          "format": "openapi",
+          "version": "3.1",
+          "path": "Application/openapi.yaml",
+          "source": "apiOperations",
+          "mandatory": true
+        },
+        {
+          "id": "async-messaging",
+          "format": "asyncapi",
+          "version": "2.6",
+          "path": "Messaging/asyncapi.yaml",
+          "source": "messaging",
+          "mandatory": false,
+          "when": "IR messaging.events or messaging.commands non-empty"
+        }
       ]
     },
     "dotnet": {
@@ -594,7 +988,8 @@
       },
       "artifacts": [
         "Design.json",
-        "openapi.yaml"
+        "openapi.yaml",
+        "asyncapi.yaml"
       ],
       "testing": [
         "xUnit"
@@ -610,13 +1005,34 @@
       },
       "references": [
         "references/aspnet-controller-pattern.md",
-        "references/Design-json-shape.json"
+        "references/Design-json-shape.json",
+        "references/contract-openapi-pattern.md",
+        "references/contract-asyncapi-pattern.md"
       ],
       "implementationSkill": "dotnet-implementation",
       "testingSkill": "dotnet-testing",
       "bestPractices": [
         "MediatR for complex handlers",
         "FluentValidation on DTOs"
+      ],
+      "designContracts": [
+        {
+          "id": "primary-api",
+          "format": "openapi",
+          "version": "3.1",
+          "path": "Application/openapi.yaml",
+          "source": "apiOperations",
+          "mandatory": true
+        },
+        {
+          "id": "async-messaging",
+          "format": "asyncapi",
+          "version": "2.6",
+          "path": "Messaging/asyncapi.yaml",
+          "source": "messaging",
+          "mandatory": false,
+          "when": "IR messaging.events or messaging.commands non-empty"
+        }
       ]
     },
     "generic-backend": {
@@ -667,13 +1083,25 @@
       },
       "references": [
         "references/generic-layered-pattern.md",
-        "references/Design-json-shape.json"
+        "references/Design-json-shape.json",
+        "references/contract-openapi-pattern.md"
       ],
       "implementationSkill": "generic-implementation",
       "testingSkill": "generic-testing",
       "bestPractices": [
         "Use layerMapping labels literally",
         "No framework annotations"
+      ],
+      "designContracts": [
+        {
+          "id": "primary-api",
+          "format": "openapi",
+          "version": "3.1",
+          "path": "Application/openapi.yaml",
+          "source": "apiOperations",
+          "mandatory": true,
+          "when": "IR apiOperations non-empty"
+        }
       ]
     }
   },

@@ -1,6 +1,6 @@
 # Design Workflow Skills
 
-Technology-agnostic design pipeline skills for Reunity.
+Technology-agnostic design pipeline skills for the design phase.
 
 ## Tuning model
 
@@ -21,6 +21,7 @@ Technology-agnostic design pipeline skills for Reunity.
 - `design-generic-data`
 - `design-generic-messaging`
 - `design-technology-base`
+- `design-skill-resolver`
 - `design-deliverable`
 - `java-adapter`
 - `react-native-adapter`

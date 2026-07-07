@@ -43,6 +43,11 @@ Transform `core_design_model.json` into **complete internal React Native design 
 - `src/output_workflow/_internal/Presentation/PresentationDesign.json`
 - `src/output_workflow/_internal/Presentation/PresentationDesign.md`
 - `src/output_workflow/_internal/Application/Design.json`
+- `src/output_workflow/_internal/Application/client-api.openapi.yaml` — when IR `apiOperations` non-empty
+
+## Design contracts
+
+When IR `apiOperations` non-empty: load `references/contract-client-api-pattern.md`; generate `Application/client-api.openapi.yaml`.
 
 ## Procedure
 

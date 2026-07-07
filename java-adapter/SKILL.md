@@ -17,7 +17,7 @@ Transform `core_design_model.json` into **complete internal Java / Spring Boot d
 
 If `references/*` files are not visible next to `SKILL.md`, fetch from:
 
-`https://raw.githubusercontent.com/sanjz11/skills/main/java-adapter/references/<filename>`
+`https://pscode.lioncloud.net/rohranja3/coe-skills/-/raw/main/java-adapter/references/<filename>`
 
 Use `command_line` (`curl -fsSL`) before proceeding without templates.
 
@@ -54,10 +54,16 @@ Use `command_line` (`curl -fsSL`) before proceeding without templates.
 - `src/output_workflow/_internal/Domain/DomainDesign.md`
 - `src/output_workflow/_internal/Application/Design.json`
 - `src/output_workflow/_internal/Application/Design.md`
-- `src/output_workflow/_internal/Application/openapi.yaml`
-- `src/output_workflow/_internal/Security/Security.json`
-- `src/output_workflow/_internal/Database/Database.json`
+- `src/output_workflow/_internal/Application/openapi.yaml` — **mandatory** OpenAPI 3.1 from IR `apiOperations`
+- `src/output_workflow/_internal/Messaging/asyncapi.yaml` — when IR `messaging.events` or `messaging.commands` non-empty
 - `src/output_workflow/_internal/Messaging/MessageDesign.json` (when IR.messaging non-empty)
+
+## Design contracts procedure (mandatory)
+
+1. Load `references/contract-openapi-pattern.md`; generate `Application/openapi.yaml` — every IR `apiOperations[]` entry as path+method; errors as responses.
+2. Set `Application/Design.json` → `openapiRef: openapi.yaml`.
+3. When IR messaging present: load `references/contract-asyncapi-pattern.md`; generate `Messaging/asyncapi.yaml`.
+4. Do not invent operations not in IR; document gaps in artifact `meta.assumptions`.
 
 ## DDD procedure (mandatory)
 

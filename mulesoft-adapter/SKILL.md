@@ -16,7 +16,7 @@ Transform `core_design_model.json` into **complete MuleSoft Anypoint design arti
 
 If `references/*` files are not visible next to `SKILL.md`, fetch from:
 
-`https://raw.githubusercontent.com/sanjz11/skills/main/mulesoft-adapter/references/<filename>`
+`https://pscode.lioncloud.net/rohranja3/coe-skills/-/raw/main/mulesoft-adapter/references/<filename>`
 
 Use `command_line` (`curl -fsSL`) before proceeding without templates.
 
@@ -37,7 +37,15 @@ Use `command_line` (`curl -fsSL`) before proceeding without templates.
 - `src/output_workflow/_internal/Integration/integration-apis.raml`
 - `src/output_workflow/_internal/Application/Design.json`
 - `src/output_workflow/_internal/Messaging/MessageDesign.json`
+- `src/output_workflow/_internal/Messaging/asyncapi.yaml` — when IR messaging non-empty
 - `src/output_workflow/_internal/Security/Security.json`
+
+## Design contracts procedure (mandatory)
+
+1. Load `references/contract-raml-pattern.md`; generate `Integration/integration-apis.raml` (RAML 1.0) from IR `apiOperations` / Experience API layer.
+2. Set `IntegrationDesign.json` → `ramlRef: integration-apis.raml`.
+3. When IR messaging present: generate `Messaging/asyncapi.yaml` (AsyncAPI 2.6+) from `messaging.events` / `messaging.commands`.
+4. All contract operations must trace to IR — no invented endpoints.
 
 ## API-led procedure (mandatory)
 

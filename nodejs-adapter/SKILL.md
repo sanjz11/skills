@@ -47,6 +47,10 @@ Transform `core_design_model.json` into **complete internal Node.js / NestJS des
 - `src/output_workflow/_internal/Database/Database.json`
 - `src/output_workflow/_internal/Messaging/MessageDesign.json`
 
+## Design contracts (mandatory)
+
+Load `references/contract-openapi-pattern.md`; generate `Application/openapi.yaml` (OpenAPI 3.1) from IR `apiOperations`. When IR messaging non-empty: `Messaging/asyncapi.yaml` per `contract-asyncapi-pattern.md`.
+
 ## Procedure
 
 1. Read IR and technology context.

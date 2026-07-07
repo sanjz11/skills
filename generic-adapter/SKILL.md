@@ -42,7 +42,11 @@ Transform `core_design_model.json` into **complete internal generic layered back
 
 - `src/output_workflow/_internal/Application/Design.json`
 - `src/output_workflow/_internal/Application/Design.md`
-- `src/output_workflow/_internal/Application/openapi.yaml`
+- `src/output_workflow/_internal/Application/openapi.yaml` — when IR `apiOperations` non-empty
+
+## Design contracts
+
+Load `references/contract-openapi-pattern.md`; generate `Application/openapi.yaml` from IR `apiOperations` when present.
 
 ## Procedure
 

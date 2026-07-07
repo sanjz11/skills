@@ -1,9 +1,15 @@
 {
   "$schema": "Core Design Model — technology-independent intermediate representation (IR)",
-  "version": "1.0",
-  "description": "All generic design agents read/write this model. Technology Adapter maps IR → stack-specific artifacts.",
+  "version": "2.0",
+  "description": "Archetype-aware IR. Technology Adapter maps IR → one resolved design skill pack.",
   "structure": {
-    "meta": { "ts": "ISO8601", "v": "1.0", "irVersion": "1.0" },
+    "meta": {
+      "ts": "ISO8601",
+      "v": "1.0",
+      "irVersion": "2.0",
+      "archetypeId": "backend-service | web-ui | mobile-ui | integration-service | data-pipeline",
+      "archetypeSource": "registry | epic | adr | user"
+    },
     "requirements": {
       "functional": [],
       "actors": [],
@@ -14,6 +20,15 @@
     "businessRules": [],
     "legacyLogicMigration": [],
     "boundedContexts": [],
+    "userExperience": {
+      "journeys": [],
+      "screens": [],
+      "navigation": {},
+      "stateModel": {},
+      "accessibility": []
+    },
+    "integrationFlows": [],
+    "dataPipelines": [],
     "apiOperations": [],
     "dataEntities": [],
     "integrations": [],
@@ -47,11 +62,45 @@
     "observability": {},
     "deployment": {}
   },
+  "archetypeRules": {
+    "backend-service": {
+      "required": ["boundedContexts", "capabilities", "businessRules", "apiOperations"],
+      "optional": ["messaging", "integrations", "legacyLogicMigration"],
+      "deEmphasize": ["userExperience", "integrationFlows", "dataPipelines"],
+      "notes": "Full DDD with aggregates per bounded context. Map every capability and dataEntity to a context."
+    },
+    "web-ui": {
+      "required": ["userExperience", "capabilities"],
+      "optional": ["apiOperations", "boundedContexts", "security"],
+      "deEmphasize": ["integrationFlows", "dataPipelines"],
+      "notes": "userExperience.screens and navigation are primary. boundedContexts optional unless epic implies domain complexity."
+    },
+    "mobile-ui": {
+      "required": ["userExperience", "capabilities"],
+      "optional": ["apiOperations", "integrations", "security"],
+      "deEmphasize": ["boundedContexts", "integrationFlows", "dataPipelines"],
+      "notes": "Include device/offline concerns in userExperience and integrations when epic implies them."
+    },
+    "integration-service": {
+      "required": ["integrationFlows", "integrations", "capabilities"],
+      "optional": ["apiOperations", "messaging", "businessRules", "boundedContexts"],
+      "deEmphasize": ["userExperience", "dataPipelines"],
+      "notes": "integrationFlows[] with steps, sources, targets, transforms, error handling — not backend DDD unless epic requires it."
+    },
+    "data-pipeline": {
+      "required": ["dataPipelines", "capabilities"],
+      "optional": ["dataEntities", "integrations", "businessRules"],
+      "deEmphasize": ["userExperience", "boundedContexts", "apiOperations"],
+      "notes": "dataPipelines[] with sources, mappings, transforms, DQ rules, scheduling."
+    }
+  },
   "rules": [
-    "No technology names in IR (no Controller, Screen, Flow, @Service)",
+    "No technology names in IR (no Controller, Screen, Flow, @Service, DataWeave, React)",
+    "Read technology_context.archetype.id and apply matching archetypeRules",
     "Use generic layer assignments: presentation, business, data, integration, configuration",
-    "Business rules use BR-ID and business language only",
-    "Legacy migration stores source excerpt language in legacyLogicMigration[].sourceLanguage — not Java",
-    "API operations are resource-oriented: method, path, operationId, request, response, errors"
+    "Business rules use BR-ID and business language only — no pseudo-code in IR",
+    "Legacy migration stores source excerpt in legacyLogicMigration[].sourceLanguage — not target stack language",
+    "API operations are resource-oriented: method, path, operationId, request, response, errors",
+    "userExperience uses generic terms: screen, view, journey, navigation — not component library names"
   ]
 }

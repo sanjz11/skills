@@ -11,7 +11,23 @@ description: >-
 
 ## Primary goal
 
-Always produce `src/output_workflow/_internal/requirements_context.json` with a **complete ADR key set** — merging uploaded ADR, epic hints, category defaults, and profile `adrDefaults` — so downstream steps never skip work because ADR was not uploaded.
+Always produce `requirements_context.json` with a **complete ADR key set**, and **`inputs_manifest.json`** that classifies every uploaded document by **content** (not UI slot) — so downstream steps use the right material even when users mis-place files.
+
+## Input classification (mandatory when uploads exist)
+
+Upload slots (`epic_template`, `adr_blueprint`, `common_patterns`, `target_domain_modelling`) are **hints only**.
+
+1. Load `references/input-classification-pattern.md` (curl fallback if not bundled).
+2. `read_file` every non-empty upload from **all four slots**.
+3. Classify each file: `epic` | `adr` | `domain_model` | `patterns` | `integration_spec` | `ux_spec` | `unknown`.
+4. Write `src/output_workflow/_internal/inputs_manifest.json` with `uploads[]`, `resolved{}`, `slotCoverage`, `assumptions`.
+5. Use `resolved.*` buckets for ADR merge and IR — never ignore a file because it is in the "wrong" slot.
+
+| Example mis-placement | Handling |
+|---------------------|----------|
+| Epic in `target_domain_modelling` | Classify as `epic`; use for capabilities and flows |
+| Domain glossary in `epic_template` | Classify as `domain_model`; use for entities / contexts |
+| ADR in `common_patterns` | Classify as `adr`; merge into requirements_context |
 
 ## Bundled file
 
@@ -29,13 +45,15 @@ Use bootstrapped copy at `_internal/_config/adr-blueprint.json` — not `config/
 
 If `adr-blueprint.json` is not visible next to `SKILL.md`:
 
-`curl -fsSL https://raw.githubusercontent.com/sanjz11/skills/main/design-requirements-base/adr-blueprint.json`
+`curl -fsSL https://pscode.lioncloud.net/rohranja3/coe-skills/-/raw/main/design-requirements-base/adr-blueprint.json`
 
 Write result to `_internal/_config/adr-blueprint.json` before synthesizing requirements.
 
 ## Success criteria
 
 - [ ] `_internal/_config/adr-blueprint.json` bootstrapped from this skill
+- [ ] `inputs_manifest.json` exists when any upload slot is non-empty
+- [ ] Every uploaded file appears in `uploads[]` with `classifiedAs` and `confidence`
 - [ ] `requirements_context.json` exists under `_internal/`
 - [ ] Every key in `adr-blueprint.json` → `keys` has a resolved value
 - [ ] `sources` documents origin per key: `uploaded` | `profile` | `category` | `default` | `inferred`
@@ -54,18 +72,20 @@ Load at the **start** of technology context resolution and **before** IR build.
 | ADR blueprint | `_internal/_config/adr-blueprint.json` (bootstrap from this skill) |
 | Technology registry | `_internal/_config/technology-registry.json` (from design-technology-base skill) |
 | Resolved profile | `src/output_workflow/_internal/technology_context.json` (when available) |
-| User ADR upload | epic inputs `adr_blueprint` |
-| Epic / patterns / domain | Design Phase Inputs |
+| User uploads (any slot) | Classify via `inputs_manifest.json` → `resolved.*` |
+| User ADR content | `resolved.adr` + `adr_blueprint` slot (content wins over slot) |
+| Epic / patterns / domain | `resolved.epic`, `resolved.patterns`, `resolved.domain_model` |
 
 ## Merge procedure (strict order)
 
 For each key in `adr-blueprint.json` → `keys`:
 
-1. **Uploaded ADR** — if `adr_blueprint` parseable and key present → use value (`source: uploaded`)
-2. **Profile `adrDefaults`** — from `technology_context.profileId` or pending profile match (`source: profile`)
-3. **Category default** — `key.categoryDefaults[architecture_type]` (`source: category`)
-4. **Global default** — `key.default` (`source: default`)
-5. **Epic inference** — only if epic explicitly states value (`source: inferred`, `needsReview: true`)
+1. **Classified ADR** — parse all files in `inputs_manifest.resolved.adr` (`source: uploaded`)
+2. **ADR slot upload** — if not already consumed from manifest (`source: uploaded`)
+3. **Profile `adrDefaults`** — from `technology_context.profileId` or pending profile match (`source: profile`)
+4. **Category default** — `key.categoryDefaults[architecture_type]` (`source: category`)
+5. **Global default** — `key.default` (`source: default`)
+6. **Epic inference** — from `resolved.epic` when epic explicitly states value (`source: inferred`, `needsReview: true`)
 
 Never leave a key undefined.
 
@@ -85,6 +105,9 @@ Never leave a key undefined.
   "inputs": {
     "adr_blueprint": "missing|partial|complete",
     "epic_template": "missing|present",
+    "inputs_manifest": "present",
+    "classifiedEpicFiles": 1,
+    "classifiedDomainFiles": 0,
     "technology_profileId": "java-spring"
   },
   "meta": {
@@ -108,12 +131,13 @@ Users can download, edit `userOverride` fields, and re-upload as `adr_blueprint`
 
 ## Handling missing inputs
 
-| Missing | Action |
-|---------|--------|
-| adr_blueprint upload | Full synthesis from profile + category + defaults; `meta.synthesized: true` |
-| epic_template | Use domain model + technology_notes + registry profile only |
-| common_patterns | Skip; note in assumptions |
-| target_domain_modelling | Derive bounded contexts later in IR from APIs |
+| Missing / mis-placed | Action |
+|---------------------|--------|
+| adr_blueprint slot empty | Check `resolved.adr` in manifest; synthesize if still empty |
+| epic_template slot empty | Use `resolved.epic` from manifest |
+| domain doc in wrong slot | Use `resolved.domain_model` — IR step consumes manifest |
+| common_patterns slot empty | Use `resolved.patterns` if classified elsewhere |
+| All slots empty | Synthesize ADR; note in assumptions; do not stop |
 | technology_context not yet written | Resolve profile first from registry + stack inputs |
 
 **Never stop** because ADR is absent.
