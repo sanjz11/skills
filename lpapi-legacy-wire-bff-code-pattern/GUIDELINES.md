@@ -5,7 +5,11 @@
 **Service name:** `lpapi-sales-bff`  
 **Repo / module root:** `lpapi-sales-bff-src`  
 **Pattern skill (HOW):** [`lpapi-legacy-wire-bff-code-pattern/SKILL.md`](../skills/lpapi-legacy-wire-bff-code-pattern/SKILL.md)  
-**ADR source of truth (HOW stack):** `_adr_index` inside the ADRs zip (always open this first)
+**Primary sources of truth (both required):**
+1. **Story pack zip** — WHAT to build for the LPAPI BFF layer  
+2. **ADRs zip → `_adr_index`** — HOW / platform alignment for the LPAPI BFF layer  
+
+Agents must consult **both**. Neither alone is enough.
 
 ---
 
@@ -41,16 +45,45 @@ Forbidden names for new modules/dirs/apps: `sales-lpapi-bff-service`, `lpapi-bff
 
 ---
 
-## 3. Source-of-truth order
+## 3. Sources of truth (Story pack zip + `_adr_index`)
 
-Follow this order. Do not invent stack or routes that contradict these.
+**Both are mandatory sources of truth** for LPAPI BFF scaffolding and codegen:
+
+| Source of truth | Location | Governs |
+|-----------------|----------|---------|
+| **Story pack zip** | Workflow **StoryPack** input | **WHAT** — endpoints, frozen API contracts, ACs, field names, parity, LPAPI wire shapes |
+| **`_adr_index`** | Inside the **ADRs zip** (open this file first) | **HOW** — stack, security, logging, Feign, deploy, LPAPI-BFF-relevant ADR paths |
+
+Do not invent endpoints, routes, DTO fields, or stack choices that contradict either source.  
+Do not use only ADRs without the story pack, and do not use only the story pack without `_adr_index` when ADRs are supplied.
+
+### Precedence when reading
 
 | Priority | Source | Use for |
 |----------|--------|---------|
-| 1 | Story pack + `_inventory/*` (endpoint inventory, frozen contracts) | **WHAT** to build (endpoints, fields, parity) |
+| 1 | **Story pack zip** (entry manifest / `_STORY.md`, frozen `*__API_contract.md`, LPAPI/legacy BFF build contracts, ACs) + derived `_inventory/*` | **WHAT** to build (LPAPI endpoints, fields, parity, acceptance) |
 | 2 | ADRs zip → **`_adr_index`** first, then only the ADR paths it lists for **LPAPI / BFF / legacy wire** | **HOW** stack, security, logging, Feign, deploy |
-| 3 | Skill `lpapi-legacy-wire-bff-code-pattern` | **HOW** packages, controllers, Feign, frozen wire style |
-| 4 | Optional guidelines upload (this document) | Hard constraints for this layer |
+| 3 | Skill `lpapi-legacy-wire-bff-code-pattern` | **HOW** packages, controllers, Feign, frozen wire coding style |
+| 4 | Optional guidelines upload (this document) | Hard scope/naming constraints for this layer |
+
+**Conflict resolution (LPAPI BFF only):**
+- Story pack vs ADR on **wire/contract (WHAT):** story pack (frozen contract) wins.
+- Story pack vs ADR on **platform stack (HOW):** `_adr_index` → listed ADR paths win.
+- Package/layout style: skill wins unless story pack or ADR explicitly mandates otherwise.
+- This guidelines file wins on **scope/naming** (single repo `lpapi-sales-bff-src`, no nested `*-lpapi-bff-service`).
+
+### Story pack zip procedure (mandatory)
+
+1. Open the **Story pack zip** supplied as workflow input (SOURCE OF TRUTH for **WHAT**).
+2. Start at the pack entry manifest (usually `_STORY.md` or the index named in the pack).
+3. Load **only** documents needed for the **LPAPI / legacy / frozen wire** surface:
+   - LPAPI / legacy BFF build contract(s)
+   - Frozen `*__API_contract.md` (or equivalent)
+   - Functional ACs scoped to LPAPI / mobile / legacy wire
+   - Parity oracles / golden fixtures when present
+4. Ignore Domain-only and Web-BFF-only contracts in this pass except where they define the **domain Feign targets** the LPAPI BFF must call.
+5. Emit / consume inventories under the single `outputRoot`, then implement **exactly** the LPAPI / `legacy_bff` endpoints listed there.
+6. Never invent LPAPI endpoints or fields that are absent from the story pack / inventory.
 
 ### ADR alignment procedure (mandatory)
 
@@ -61,7 +94,7 @@ Follow this order. Do not invent stack or routes that contradict these.
    - BFF Feign / Resilience4j / logging / security as used by BFF
 4. Follow the **paths listed in `_adr_index`** for those entries. Ignore Domain-only, Web-UI-only, or unrelated surface ADRs unless `_adr_index` explicitly ties them to LPAPI BFF.
 5. Record applied ADR ids/paths in inventory / decision notes when required by the workflow.
-6. If `_adr_index` and the skill conflict on package layout: **skill wins for LPAPI package tree**; ADR wins for platform stack (Java version, parent POM, secrets, observability) unless inventory overrides.
+6. If `_adr_index` and the skill conflict on package layout: **skill wins for LPAPI package tree**; ADR wins for platform stack (Java version, parent POM, secrets, observability) unless the **story pack** frozen contract overrides wire-related choices.
 
 ---
 
@@ -121,7 +154,9 @@ Implement **exactly** the LPAPI endpoints in `endpoint_inventory.json` for this 
 | Nest a second Boot module inside the repo | Put code under `src/main/java/com/renuity/sales/` |
 | Generate Domain or Web BFF in this pass | Skip those layers / leave to their agents |
 | Modernize LPAPI routes to `/api/sales/v1/...` | Keep frozen `/api/SalesApi/...` (or contract paths) |
+| Ignore story pack zip and invent endpoints/fields | Always open story pack first for **WHAT** (LPAPI contracts/ACs) |
 | Ignore `_adr_index` and pick random ADRs | Always start from `_adr_index`, LPAPI paths only |
+| Use only ADRs or only story pack | Use **both** sources of truth together |
 | Copy `sales-schedule-lpapi-bff` as a nested project | Mirror its **patterns** inside `lpapi-sales-bff-src` |
 
 ---
@@ -132,8 +167,10 @@ Implement **exactly** the LPAPI endpoints in `endpoint_inventory.json` for this 
 - [ ] All files under `lpapi-sales-bff-src` (no nested `*-lpapi-bff-service`)  
 - [ ] `artifactId` / app name = `lpapi-sales-bff-src` / `lpapi-sales-bff`  
 - [ ] Package tree matches `lpapi-legacy-wire-bff-code-pattern` skill  
-- [ ] `_adr_index` read; only LPAPI-BFF-relevant ADR paths applied  
-- [ ] Frozen wire parity preserved (paths, JSON names, error strings)  
+- [ ] Story pack zip read; LPAPI/legacy contracts + ACs used as **WHAT** source of truth  
+- [ ] `_adr_index` read; only LPAPI-BFF-relevant ADR paths applied (**HOW** source of truth)  
+- [ ] Frozen wire parity preserved (paths, JSON names, error strings) per story pack  
+
 - [ ] Feign → domain with Resilience4j; no JPA  
 - [ ] Tests added for controllers/services (and golden fixtures if frozen)  
 - [ ] No Domain / Web BFF / duplicate service scaffolding created  
